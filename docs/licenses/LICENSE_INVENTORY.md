@@ -29,10 +29,23 @@
 | JUnit 5 | Boot BOM | EPL-2.0 | test (dağıtılmaz) | Doğrulandı |
 | Next.js | 16.4.1 | MIT | runtime (web) | Doğrulandı |
 | React | 19.x | MIT | runtime (web) | Doğrulandı |
-| Tailwind CSS | 4.x | MIT | build | Doğrulandı |
-| TypeScript | 5.x | Apache-2.0 | build | Doğrulandı |
+| Tailwind CSS | 4.x | MIT | build | Eklenmedi (PHASE-08) |
+| TypeScript | 5.9.3 | Apache-2.0 | build | Doğrulandı |
+| Testing Library (react, jest-dom), jsdom | 16.3.3 / 7.0.1 / 30.1.3 | MIT | test | Doğrulandı |
+| CycloneDX Maven plugin | 2.9.1 | Apache-2.0 | build | Doğrulandı |
 | Vitest | 5.x | MIT | test | Doğrulandı |
 | Docusaurus | 3.x | MIT | docs (PHASE-16) | Doğrulandı |
+
+## İlk SBOM taraması (2026-10-15, PHASE-01)
+
+- **Maven (126 bileşen):** 103 Apache-2.0, 8 BSD-3-Clause, 5 MIT, diğerleri çift lisanslı ve izin verici seçenekli:
+  logback (EPL-2.0 / LGPL-2.1), jakarta.* (EPL-2.0 / GPL-2.0-CPE / BSD-3), aspectjweaver (EPL-2.0),
+  amqp-client (Apache-2.0 / MPL-2.0 / GPL-2.0 — Apache-2.0 seçilir). Engelli lisans yok.
+- **npm prod (18 bileşen):** MIT/Apache-2.0/ISC/0BSD dışında inceleme gerektirenler:
+  - `@img/sharp-libvips-*` **LGPL-3.0-or-later** — Next.js görsel optimizasyonunun opsiyonel native bağımlılığı,
+    dinamik bağlı. Self-hosted dağıtımda LGPL bildirimi gerekir; alternatif `images.unoptimized`. Karar PHASE-08.
+  - `caniuse-lite` **CC-BY-4.0** — veri dosyası; atıf NOTICE'a eklenir.
+  - `UNKNOWN` görünen 3 paket AIH'nin kendi workspace paketleridir (`UNLICENSED`).
 
 ## Reddedilen / engelli
 

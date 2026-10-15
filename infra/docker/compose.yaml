@@ -1,0 +1,68 @@
+name: aka-integration-hub
+
+services:
+  postgres:
+    image: postgres:${POSTGRES_VERSION:?pin-version}
+    environment:
+      POSTGRES_DB: aih
+      POSTGRES_USER: aih
+      POSTGRES_PASSWORD: ${AIH_DB_PASSWORD:?set-in-env}
+    ports:
+      - "127.0.0.1:${AIH_DB_HOST_PORT:-25432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aih -d aih"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  valkey:
+    image: valkey/valkey:${VALKEY_VERSION:?pin-version}
+    command: ["valkey-server", "--requirepass", "${AIH_VALKEY_PASSWORD:?set-in-env}", "--appendonly", "no"]
+    ports:
+      - "127.0.0.1:${AIH_VALKEY_HOST_PORT:-26379}:6379"
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli -a \"$${AIH_VALKEY_PASSWORD}\" --no-auth-warning ping | grep PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    environment:
+      AIH_VALKEY_PASSWORD: ${AIH_VALKEY_PASSWORD}
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:${RABBITMQ_VERSION:?pin-version}
+    environment:
+      RABBITMQ_DEFAULT_USER: aih
+      RABBITMQ_DEFAULT_PASS: ${AIH_RABBITMQ_PASSWORD:?set-in-env}
+      RABBITMQ_DEFAULT_VHOST: aih
+    ports:
+      - "127.0.0.1:${AIH_RABBITMQ_HOST_PORT:-25672}:5672"
+      - "127.0.0.1:${AIH_RABBITMQ_UI_HOST_PORT:-25673}:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:${MAILPIT_VERSION:?pin-version}
+    profiles: ["dev-mail"]
+    ports:
+      - "127.0.0.1:${AIH_MAILPIT_UI_HOST_PORT:-28025}:8025"
+      - "127.0.0.1:${AIH_MAILPIT_SMTP_HOST_PORT:-21025}:1025"
+    environment:
+      MP_MAX_MESSAGES: "5000"
+    command: ["--database", "/data/mailpit.db"]
+    volumes:
+      - mailpit_data:/data
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  mailpit_data:

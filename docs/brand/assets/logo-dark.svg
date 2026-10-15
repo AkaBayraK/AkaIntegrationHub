@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" role="img" aria-labelledby="t">
+  <title id="t">Aka Integration Hub</title>
+  <defs>
+    <linearGradient id="aih-a" x1="8" y1="62" x2="56" y2="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="0.55" stop-color="#7C3AED"/>
+      <stop offset="1" stop-color="#06B6D4"/>
+    </linearGradient>
+  </defs>
+  <path d="M10 60 L28.5 18.5 a4 4 0 0 1 7 0 L54 60" fill="none" stroke="url(#aih-a)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M19 47 C27 39 37 53 45 45" fill="none" stroke="#06B6D4" stroke-width="6" stroke-linecap="round"/>
+  <g font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" fill="#F8FAFC">
+    <text x="72" y="34" font-size="26" font-weight="800">Aka</text>
+    <text x="72" y="60" font-size="22" font-weight="700">Integration Hub</text>
+  </g>
+</svg>

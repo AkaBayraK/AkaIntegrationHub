@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: aih-worker
+  threads:
+    virtual:
+      enabled: true
+  rabbitmq:
+    host: ${AIH_RABBITMQ_HOST:localhost}
+    port: ${AIH_RABBITMQ_PORT:25672}
+    username: ${AIH_RABBITMQ_USER:aih}
+    password: ${AIH_RABBITMQ_PASSWORD:}
+    virtual-host: ${AIH_RABBITMQ_VHOST:aih}
+
+server:
+  port: ${AIH_WORKER_PORT:28090}
+  shutdown: graceful
+
+management:
+  server:
+    port: ${AIH_WORKER_MANAGEMENT_PORT:28091}
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+      group:
+        readiness:
+          include: readinessState,rabbit
+
+logging:
+  structured:
+    format:
+      console: ${AIH_LOG_FORMAT:ecs}

@@ -12,5 +12,6 @@
   - `locale` → `tr` / `en`; metinler paket içindeki sözlüklerden.
   - `navigation` → host router'ına bağlanan `navigate(path)`.
 - **iframe temel çözüm değildir** (MASTER_PROMPT §9).
-- Stil: Tailwind ön eki `aih-` + CSS değişkenleri; host stilleriyle çakışmaz. Erişilebilirlik WCAG 2.2 AA hedefi.
+- Stil: `@aka/design-tokens` CSS değişkenleri (`--aih-*`) + `aih-` önekli sınıflar; host stilleriyle çakışmaz.
+  Tailwind PHASE-08'de gerekirse `aih:` önekiyle eklenir (PHASE-01'de bağımlılık eklenmedi). Erişilebilirlik WCAG 2.2 AA hedefi.
 - Storybook her ekran için senaryo içerir (PHASE-08/16).
