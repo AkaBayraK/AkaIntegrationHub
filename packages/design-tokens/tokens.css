@@ -1,0 +1,58 @@
+:root {
+  --aih-color-brand-navy: #0B1B3F;
+  --aih-color-brand-blue: #2563EB;
+  --aih-color-brand-violet: #7C3AED;
+  --aih-color-brand-turquoise: #06B6D4;
+  --aih-color-brand-green: #10B981;
+
+  --aih-color-bg: #F8FAFC;
+  --aih-color-surface: #FFFFFF;
+  --aih-color-text: #0B1B3F;
+  --aih-color-text-muted: #475569;
+  --aih-color-border: #E2E8F0;
+  --aih-color-accent: #2563EB;
+  --aih-color-accent-text: #FFFFFF;
+  --aih-color-focus: #7C3AED;
+  --aih-color-danger: #DC2626;
+  --aih-color-success: #047857;
+
+  --aih-radius-sm: 6px;
+  --aih-radius-md: 10px;
+  --aih-radius-lg: 16px;
+  --aih-space-1: 4px;
+  --aih-space-2: 8px;
+  --aih-space-3: 12px;
+  --aih-space-4: 16px;
+  --aih-space-6: 24px;
+  --aih-space-8: 32px;
+  --aih-font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --aih-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-aih-theme="light"]) {
+    --aih-color-bg: #0B1220;
+    --aih-color-surface: #111A2E;
+    --aih-color-text: #F8FAFC;
+    --aih-color-text-muted: #94A3B8;
+    --aih-color-border: #1E293B;
+    --aih-color-accent: #60A5FA;
+    --aih-color-accent-text: #0B1220;
+    --aih-color-focus: #A78BFA;
+    --aih-color-danger: #F87171;
+    --aih-color-success: #34D399;
+  }
+}
+
+:root[data-aih-theme="dark"] {
+  --aih-color-bg: #0B1220;
+  --aih-color-surface: #111A2E;
+  --aih-color-text: #F8FAFC;
+  --aih-color-text-muted: #94A3B8;
+  --aih-color-border: #1E293B;
+  --aih-color-accent: #60A5FA;
+  --aih-color-accent-text: #0B1220;
+  --aih-color-focus: #A78BFA;
+  --aih-color-danger: #F87171;
+  --aih-color-success: #34D399;
+}

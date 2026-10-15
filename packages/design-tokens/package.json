@@ -1,0 +1,12 @@
+{
+  "name": "@aka/design-tokens",
+  "version": "0.1.0",
+  "description": "Aka Integration Hub design tokens (CSS custom properties + JSON)",
+  "license": "UNLICENSED",
+  "private": true,
+  "files": ["tokens.css", "tokens.json"],
+  "exports": {
+    "./tokens.css": "./tokens.css",
+    "./tokens.json": "./tokens.json"
+  }
+}

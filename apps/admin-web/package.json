@@ -1,0 +1,18 @@
+{
+  "name": "@aka/admin-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 28030",
+    "build": "next build",
+    "start": "next start --port 28030",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aka/design-tokens": "0.1.0",
+    "@aka/integration-ui": "0.1.0",
+    "next": "16.4.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  }
+}
