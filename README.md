@@ -6,7 +6,8 @@ SaaS veya self-hosted çalışan entegrasyon ve bildirim platformu.
 > Durum: **PHASE-01 (Foundation & Branding)**. Faz planı: [PHASES.md](PHASES.md) · Durum: [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md)
 
 ## Hızlı başlangıç
-Gereksinimler: Docker, JDK 21+ (derleme `--release 21`), Maven 3.9+, Node 22+.
+Gereksinimler: Docker, JDK 21+ (derleme `--release 21`), Maven 3.9+, Node 22.23.4+ / 24.22.1+ / 26.12.1+ (`.nvmrc`).
+JDK, CVE-2026-91403 için yamalı olmalı: [docs/security/JDK_NODE_PATCH_2026-10.md](docs/security/JDK_NODE_PATCH_2026-10.md).
 
 ```bash
 make up            # PostgreSQL, Valkey, RabbitMQ (.env yoksa .env.example'dan oluşturur)

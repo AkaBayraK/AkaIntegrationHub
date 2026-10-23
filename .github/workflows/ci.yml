@@ -21,8 +21,17 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '21.0.13'
+          check-latest: true
           cache: maven
+      - name: Block compromised eMudhra intermediates (CVE-2026-91403)
+        run: |
+          f="$JAVA_HOME/lib/security/blocked.certs"
+          { echo 'Algorithm=SHA-256'; grep -hE '^[0-9A-F]{64}$' "$f" infra/security/emudhra-blocked.certs | sort -u; } > /tmp/blocked.certs
+          cp /tmp/blocked.certs "$f"
+          missing=$(comm -23 <(grep -E '^[0-9A-F]{64}$' infra/security/emudhra-blocked.certs | sort -u) <(grep -E '^[0-9A-F]{64}$' "$f" | sort -u) | wc -l)
+          test "$missing" -eq 0
+          java -version
       - name: Build and test
         run: mvn -B -ntp verify
       - name: Maven SBOM (CycloneDX)
@@ -39,7 +48,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
-          node-version: '22'
+          node-version: '22.23.4'
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: npm run build

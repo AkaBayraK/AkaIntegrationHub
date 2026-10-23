@@ -1,6 +1,10 @@
 # Changelog
 
 ## [Unreleased]
+### Güvenlik
+- JDK CVE-2026-91403: CI Temurin 21.0.13'e sabitlendi ve eMudhra blok listesi JDK'ya birleştiriliyor ([docs/security/JDK_NODE_PATCH_2026-10.md](docs/security/JDK_NODE_PATCH_2026-10.md)).
+- Node.js: CI ve `.nvmrc` 22.23.4; `engines` yamalı 22/24/26 hatlarıyla sınırlandı.
+
 ### PHASE-01 — Foundation & Branding
 - Maven reactor: `aih-common`, `aih-api`, `aih-worker` (Spring Boot 4.1.1, Java 21 bytecode).
 - API: liveness/readiness (PostgreSQL + Valkey + RabbitMQ), ayrı yönetim portu, `X-Correlation-Id`, RFC 9457 hata modeli, `GET /v1/system/info`, Flyway ilk migration.
