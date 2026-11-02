@@ -12,8 +12,7 @@ import type {
 import { useAkaIntegration, useTranslation } from '../../context';
 import type { MessageKey } from '../../i18n/messages';
 import { useHubClient, useHubSession } from '../../session';
-import { SMTP_BASE_PATH } from './SmtpAccountsPage';
-import { ErrorNotice } from './shared';
+import { ErrorNotice, SMTP_BASE_PATH } from './shared';
 
 type FormState = SmtpAccountInput & { password: string; makeDefault: boolean };
 type Errors = Partial<Record<keyof FormState, MessageKey | string>>;

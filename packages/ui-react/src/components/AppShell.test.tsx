@@ -34,12 +34,12 @@ describe('AppShell', () => {
     render(<Host><AppShell>content</AppShell></Host>);
 
     expect(screen.getByRole('navigation', { name: 'Ana menü' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Genel Bakış' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Ana Sayfa' })).toHaveAttribute('aria-current', 'page');
 
     fireEvent.change(screen.getByLabelText('Dil'), { target: { value: 'en' } });
 
     expect(screen.getByRole('navigation', { name: 'Main navigation' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Overview' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
   });
 
   it('toggles theme through the host adapter', () => {

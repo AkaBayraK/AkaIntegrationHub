@@ -101,11 +101,12 @@ describe('SmtpAccountsPage', () => {
     });
     render(<Host fetchMock={fetchMock}><SmtpAccountsPage /></Host>);
 
-    const row = await screen.findByRole('row', { name: /Kurumsal SMTP/ });
-    expect(within(row).getByText('Varsayılan')).toBeInTheDocument();
-    expect(within(row).getByText('smtp.example.com:587')).toBeInTheDocument();
-    expect(within(row).getByRole('button', { name: 'Bağlantı testi: Kurumsal SMTP' })).toBeInTheDocument();
-    expect(within(row).queryByRole('button', { name: /Varsayılan yap/ })).not.toBeInTheDocument();
+    const detail = await screen.findByRole('region', { name: 'Kurumsal SMTP' });
+    expect(within(detail).getByText('Varsayılan')).toBeInTheDocument();
+    expect(within(detail).getByText('smtp.example.com:587')).toBeInTheDocument();
+    expect(within(detail).getByRole('button', { name: 'Bağlantı testi: Kurumsal SMTP' })).toBeInTheDocument();
+    expect(within(detail).queryByRole('button', { name: /Varsayılan yap/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('list', { name: 'SMTP hesap listesi' })).toHaveTextContent('noreply@example.com');
     const [, init] = fetchMock.mock.calls.find(([u]) => String(u).includes('/smtp-accounts'))!;
     expect((init!.headers as Record<string, string>).Authorization).toBe('Bearer token-123');
   });
@@ -115,7 +116,7 @@ describe('SmtpAccountsPage', () => {
       url.pathname === '/v1/me' ? { body: me(['smtp-account:read']) } : { body: { items: [ACCOUNT], nextCursor: null } },
     );
     render(<Host fetchMock={fetchMock}><SmtpAccountsPage /></Host>);
-    await screen.findByRole('row', { name: /Kurumsal SMTP/ });
+    await screen.findByRole('region', { name: 'Kurumsal SMTP' });
     expect(screen.queryByRole('button', { name: 'Yeni hesap' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Bağlantı testi/ })).not.toBeInTheDocument();
   });
@@ -172,6 +173,19 @@ describe('SmtpAccountsPage', () => {
     );
     render(<Host fetchMock={fetchMock}><SmtpAccountsPage /></Host>);
     expect(await screen.findByRole('alert')).toHaveTextContent('corr-12345678');
+  });
+
+  it('switches the detail panel when another account is selected', async () => {
+    const second = { ...ACCOUNT, id: 'acc-2', name: 'Destek', isDefault: false, lastTestOutcome: 'failed' as const };
+    const fetchMock = mockFetch((url) =>
+      url.pathname === '/v1/me' ? { body: me(ADMIN) } : { body: { items: [ACCOUNT, second], nextCursor: null } },
+    );
+    render(<Host fetchMock={fetchMock}><SmtpAccountsPage /></Host>);
+    await screen.findByRole('region', { name: 'Kurumsal SMTP' });
+    fireEvent.click(screen.getByRole('button', { name: /Destek/ }));
+    const detail = screen.getByRole('region', { name: 'Destek' });
+    expect(within(detail).getByText('Test başarısız')).toBeInTheDocument();
+    expect(within(detail).getByRole('button', { name: 'Varsayılan yap: Destek' })).toBeInTheDocument();
   });
 });
 

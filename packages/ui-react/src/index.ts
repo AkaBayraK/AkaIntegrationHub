@@ -23,3 +23,5 @@ export { SmtpAccountForm, validateSmtpForm } from './components/smtp/SmtpAccount
 export { EmailDeliveriesPage } from './components/smtp/EmailDeliveriesPage';
 export { ConnectionTestResult } from './components/smtp/ConnectionTestResult';
 export { SendTestEmailPanel } from './components/smtp/SendTestEmailPanel';
+export { IntegrationsHome } from './components/integrations/IntegrationsHome';
+export { INTEGRATION_TYPES, type IntegrationType, type IntegrationTypeId } from './components/integrations/catalog';

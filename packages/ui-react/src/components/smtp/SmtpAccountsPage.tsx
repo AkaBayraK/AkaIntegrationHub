@@ -1,38 +1,44 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import type { AccountEnvironment, ConnectionTest, ProviderType, SmtpAccount } from '../../api/types';
 import { useAkaIntegration, useTranslation } from '../../context';
 import { useHubClient, useHubSession } from '../../session';
 import { ConnectionTestResult } from './ConnectionTestResult';
 import { SendTestEmailPanel } from './SendTestEmailPanel';
-import { Badge, ConfirmPanel, ErrorNotice, formatDate } from './shared';
+import {
+  accountHealth,
+  Badge,
+  ConfirmPanel,
+  ErrorNotice,
+  formatDate,
+  HEALTH_LABELS,
+  HEALTH_TONES,
+  Kpi,
+  PROVIDER_LABELS,
+  ProviderMark,
+  SMTP_BASE_PATH,
+  StatusPill,
+  TypeMark,
+} from './shared';
 
-export const SMTP_BASE_PATH = '/admin/email/providers';
-
-const PROVIDER_LABELS: Record<ProviderType, string> = {
-  custom_smtp: 'Custom SMTP',
-  microsoft_365: 'Microsoft 365',
-  google_workspace: 'Google Workspace',
-  amazon_ses: 'Amazon SES',
-  mailpit_test: 'Mailpit',
-};
+export { SMTP_BASE_PATH } from './shared';
 
 type Pending = { kind: 'disable' | 'enable' | 'makeDefault'; account: SmtpAccount } | null;
+type Translate = ReturnType<typeof useTranslation>;
 
-export function SmtpAccountsPage({ basePath = SMTP_BASE_PATH }: { basePath?: string }) {
+export function SmtpAccountsPage({ basePath = SMTP_BASE_PATH, homePath = '/' }: { basePath?: string; homePath?: string }) {
   const t = useTranslation();
-  const { navigation, locale } = useAkaIntegration();
+  const { navigation } = useAkaIntegration();
   const client = useHubClient();
   const session = useHubSession();
   const tenantId = session.me?.tenant.id ?? null;
   const canWrite = session.can('smtp-account:write');
-  const canTest = session.can('smtp-account:test');
-  const canSend = session.can('smtp-account:send-test');
 
   const [q, setQ] = useState('');
   const [environment, setEnvironment] = useState<AccountEnvironment | ''>('');
   const [status, setStatus] = useState<'' | 'enabled' | 'disabled'>('');
   const [providerType, setProviderType] = useState<ProviderType | ''>('');
   const [accounts, setAccounts] = useState<SmtpAccount[] | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<ConnectionTest | null>(null);
@@ -100,13 +106,31 @@ export function SmtpAccountsPage({ basePath = SMTP_BASE_PATH }: { basePath?: str
   if (session.error) return <ErrorNotice error={session.error} onRetry={session.reload} />;
 
   const filtered = Boolean(q || environment || status || providerType);
+  const selected = accounts?.find((a) => a.id === selectedId) ?? accounts?.[0] ?? null;
 
   return (
     <div className="aih-page">
+      <nav className="aih-crumb" aria-label={t('hub.back')}>
+        <a
+          href={homePath}
+          onClick={(event) => {
+            event.preventDefault();
+            navigation.navigate(homePath);
+          }}
+        >
+          ← {t('hub.back')}
+        </a>
+        <span aria-hidden="true"> / </span>
+        <span>{t('hub.type.email.name')}</span>
+      </nav>
+
       <div className="aih-row aih-row--between">
-        <div>
-          <h1>{t('smtp.title')}</h1>
-          <p className="aih-muted">{t('smtp.description')}</p>
+        <div className="aih-row aih-page-title">
+          <TypeMark symbol="✉" type="email" />
+          <div>
+            <h1>{t('smtp.title')}</h1>
+            <p className="aih-muted">{t('smtp.description')}</p>
+          </div>
         </div>
         {canWrite && (
           <button
@@ -114,13 +138,15 @@ export function SmtpAccountsPage({ basePath = SMTP_BASE_PATH }: { basePath?: str
             className="aih-button aih-button--primary"
             onClick={() => navigation.navigate(`${basePath}/new`)}
           >
-            {t('smtp.new')}
+            + {t('smtp.new')}
           </button>
         )}
       </div>
 
+      {accounts && accounts.length > 0 && <SmtpKpis accounts={accounts} t={t} />}
+
       <div className="aih-filters" role="search">
-        <label className="aih-field">
+        <label className="aih-field aih-field--grow">
           <span className="aih-visually-hidden">{t('smtp.search')}</span>
           <input
             className="aih-input"
@@ -173,7 +199,6 @@ export function SmtpAccountsPage({ basePath = SMTP_BASE_PATH }: { basePath?: str
           busy={busyId === pending.account.id}
         />
       )}
-      {testResult && <ConnectionTestResult result={testResult} onClose={() => setTestResult(null)} />}
       {sendFor && (
         <SendTestEmailPanel account={sendFor} defaultRecipient={session.me?.email} onClose={() => setSendFor(null)} />
       )}
@@ -182,118 +207,248 @@ export function SmtpAccountsPage({ basePath = SMTP_BASE_PATH }: { basePath?: str
         <p role="status">{t('common.loading')}</p>
       ) : accounts && accounts.length === 0 ? (
         <p className="aih-card aih-muted">{filtered ? t('smtp.emptyFiltered') : t('smtp.empty')}</p>
-      ) : accounts ? (
-        <div className="aih-table-wrap">
-          <table className="aih-table">
-            <caption className="aih-visually-hidden">{t('smtp.title')}</caption>
-            <thead>
-              <tr>
-                <th scope="col">{t('smtp.col.name')}</th>
-                <th scope="col">{t('smtp.col.provider')}</th>
-                <th scope="col">{t('smtp.col.host')}</th>
-                <th scope="col">{t('smtp.col.sender')}</th>
-                <th scope="col">{t('smtp.col.environment')}</th>
-                <th scope="col">{t('smtp.col.lastTest')}</th>
-                <th scope="col">{t('smtp.col.lastSend')}</th>
-                <th scope="col">{t('smtp.col.status')}</th>
-                <th scope="col">{t('common.actions')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {accounts.map((account) => (
-                <tr key={account.id}>
-                  <th scope="row">
-                    {account.name} {account.isDefault && <Badge tone="accent">{t('smtp.default')}</Badge>}
-                  </th>
-                  <td>{PROVIDER_LABELS[account.providerType]}</td>
-                  <td>
-                    <code>
-                      {account.host}:{account.port}
-                    </code>
-                  </td>
-                  <td>{account.senderAddress}</td>
-                  <td>{t(account.environment === 'production' ? 'smtp.env.production' : 'smtp.env.test')}</td>
-                  <td>
-                    {account.lastTestOutcome ? (
-                      <Badge tone={account.lastTestOutcome === 'passed' ? 'success' : 'danger'}>
-                        {t(account.lastTestOutcome === 'passed' ? 'smtp.test.passed' : 'smtp.test.failed')}
-                      </Badge>
-                    ) : (
-                      <span className="aih-muted">{t('smtp.never')}</span>
-                    )}{' '}
-                    <span className="aih-muted">{formatDate(account.lastTestAt, locale.locale)}</span>
-                  </td>
-                  <td>{formatDate(account.lastSuccessSendAt, locale.locale) ?? <span className="aih-muted">{t('smtp.never')}</span>}</td>
-                  <td>
-                    <Badge tone={account.enabled ? 'success' : 'neutral'}>
-                      {t(account.enabled ? 'smtp.status.enabled' : 'smtp.status.disabled')}
-                    </Badge>
-                  </td>
-                  <td>
-                    <div className="aih-row aih-table-actions">
-                      {canWrite && (
-                        <button
-                          type="button"
-                          className="aih-button aih-button--ghost aih-button--sm"
-                          onClick={() => navigation.navigate(`${basePath}/${account.id}/edit`)}
-                          aria-label={`${t('smtp.action.edit')}: ${account.name}`}
-                        >
-                          {t('smtp.action.edit')}
-                        </button>
-                      )}
-                      {canTest && (
-                        <button
-                          type="button"
-                          className="aih-button aih-button--ghost aih-button--sm"
-                          onClick={() => void runTest(account)}
-                          disabled={busyId === account.id}
-                          aria-label={`${t('smtp.action.test')}: ${account.name}`}
-                        >
-                          {busyId === account.id ? t('common.loading') : t('smtp.action.test')}
-                        </button>
-                      )}
-                      {canSend && account.enabled && (
-                        <button
-                          type="button"
-                          className="aih-button aih-button--ghost aih-button--sm"
-                          onClick={() => setSendFor(account)}
-                          aria-label={`${t('smtp.action.sendTest')}: ${account.name}`}
-                        >
-                          {t('smtp.action.sendTest')}
-                        </button>
-                      )}
-                      {canWrite && account.enabled && !account.isDefault && (
-                        <button
-                          type="button"
-                          className="aih-button aih-button--ghost aih-button--sm"
-                          onClick={() => setPending({ kind: 'makeDefault', account })}
-                          aria-label={`${t('smtp.action.makeDefault')}: ${account.name}`}
-                        >
-                          {t('smtp.action.makeDefault')}
-                        </button>
-                      )}
-                      {canWrite && (
-                        <button
-                          type="button"
-                          className="aih-button aih-button--ghost aih-button--sm"
-                          onClick={() =>
-                            account.enabled
-                              ? setPending({ kind: 'disable', account })
-                              : void confirmPending({ kind: 'enable', account })
-                          }
-                          aria-label={`${t(account.enabled ? 'smtp.action.disable' : 'smtp.action.enable')}: ${account.name}`}
-                        >
-                          {t(account.enabled ? 'smtp.action.disable' : 'smtp.action.enable')}
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      ) : accounts && selected ? (
+        <div className="aih-split">
+          <AccountList
+            accounts={accounts}
+            selectedId={selected.id}
+            onSelect={(id) => {
+              setSelectedId(id);
+              setTestResult(null);
+            }}
+            onCreate={canWrite ? () => navigation.navigate(`${basePath}/new`) : undefined}
+            t={t}
+          />
+          <AccountDetail
+            account={selected}
+            basePath={basePath}
+            busy={busyId === selected.id}
+            testResult={testResult?.accountId === selected.id ? testResult : null}
+            onCloseTest={() => setTestResult(null)}
+            onTest={() => void runTest(selected)}
+            onSendTest={() => setSendFor(selected)}
+            onMakeDefault={() => setPending({ kind: 'makeDefault', account: selected })}
+            onToggle={() =>
+              selected.enabled
+                ? setPending({ kind: 'disable', account: selected })
+                : void confirmPending({ kind: 'enable', account: selected })
+            }
+          />
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function SmtpKpis({ accounts, t }: { accounts: SmtpAccount[]; t: Translate }) {
+  const active = accounts.filter((a) => a.enabled).length;
+  const tested = accounts.filter((a) => a.lastTestOutcome !== null);
+  const passed = tested.filter((a) => a.lastTestOutcome === 'passed').length;
+  const failing = accounts.filter((a) => accountHealth(a) === 'failing');
+  const defaults = accounts.filter((a) => a.isDefault).map((a) => a.name);
+  return (
+    <div className="aih-kpis">
+      <Kpi label={t('smtp.kpi.active')} value={`${active} / ${accounts.length}`} />
+      <Kpi label={t('smtp.kpi.default')} value={defaults[0] ?? t('smtp.kpi.none')} hint={defaults.slice(1).join(', ') || undefined} />
+      <Kpi label={t('smtp.kpi.tested')} value={`${passed} / ${tested.length}`} />
+      <Kpi
+        label={t('smtp.kpi.attention')}
+        value={failing.length}
+        hint={failing.length ? failing.map((a) => a.name).join(', ') : t('smtp.kpi.allGood')}
+        tone={failing.length ? 'danger' : 'success'}
+      />
+    </div>
+  );
+}
+
+function AccountList({
+  accounts,
+  selectedId,
+  onSelect,
+  onCreate,
+  t,
+}: {
+  accounts: SmtpAccount[];
+  selectedId: string;
+  onSelect: (id: string) => void;
+  onCreate?: () => void;
+  t: Translate;
+}) {
+  return (
+    <div className="aih-surface aih-list">
+      <ul aria-label={t('smtp.list.label')}>
+        {accounts.map((account) => {
+          const health = accountHealth(account);
+          return (
+            <li key={account.id}>
+              <button
+                type="button"
+                className={account.id === selectedId ? 'aih-list__item aih-list__item--active' : 'aih-list__item'}
+                aria-current={account.id === selectedId ? 'true' : undefined}
+                onClick={() => onSelect(account.id)}
+              >
+                <ProviderMark providerType={account.providerType} size="sm" />
+                <span className="aih-list__text">
+                  <span className="aih-list__name">{account.name}</span>
+                  <span className="aih-list__sub">{account.senderAddress}</span>
+                </span>
+                <span className={`aih-dot aih-dot--${HEALTH_TONES[health]}`} title={t(HEALTH_LABELS[health])} />
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+      {onCreate && (
+        <button type="button" className="aih-add-row" onClick={onCreate}>
+          + {t('smtp.new')}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function AccountDetail({
+  account,
+  basePath,
+  busy,
+  testResult,
+  onCloseTest,
+  onTest,
+  onSendTest,
+  onMakeDefault,
+  onToggle,
+}: {
+  account: SmtpAccount;
+  basePath: string;
+  busy: boolean;
+  testResult: ConnectionTest | null;
+  onCloseTest: () => void;
+  onTest: () => void;
+  onSendTest: () => void;
+  onMakeDefault: () => void;
+  onToggle: () => void;
+}) {
+  const t = useTranslation();
+  const { navigation, locale } = useAkaIntegration();
+  const session = useHubSession();
+  const canWrite = session.can('smtp-account:write');
+  const canTest = session.can('smtp-account:test');
+  const canSend = session.can('smtp-account:send-test');
+  const health = accountHealth(account);
+  const headingId = `aih-account-${account.id}`;
+  const tls = t(`smtp.form.tls.${account.tlsMode}` as const);
+  const secret = t(account.hasSecret ? 'smtp.detail.secretStored' : 'smtp.detail.noSecret');
+
+  return (
+    <section className="aih-surface aih-detail" aria-labelledby={headingId}>
+      <header className="aih-detail__head">
+        <ProviderMark providerType={account.providerType} />
+        <div className="aih-detail__title">
+          <h2 id={headingId}>{account.name}</h2>
+          <p className="aih-muted">
+            {PROVIDER_LABELS[account.providerType]} ·{' '}
+            {t(account.environment === 'production' ? 'smtp.env.production' : 'smtp.env.test')}
+          </p>
+        </div>
+        <div className="aih-row aih-row--wrap">
+          {account.isDefault && <Badge tone="accent">{t('smtp.default')}</Badge>}
+          <StatusPill tone={HEALTH_TONES[health]}>{t(HEALTH_LABELS[health])}</StatusPill>
+        </div>
+      </header>
+
+      <dl className="aih-facts">
+        <Fact label={t('smtp.col.sender')} value={account.senderAddress} />
+        <Fact label={t('smtp.col.host')} value={<code>{`${account.host}:${account.port}`}</code>} />
+        <Fact label={t('smtp.detail.security')} value={`${tls} · ${secret}`} />
+        <Fact label={t('smtp.detail.priority')} value={account.priority} />
+        <Fact label={t('smtp.detail.timeout')} value={`${account.timeoutSeconds} ${t('smtp.detail.seconds')}`} />
+        <Fact
+          label={t('smtp.detail.rateLimit')}
+          value={
+            account.rateLimitPerMinute ? `${account.rateLimitPerMinute} ${t('smtp.detail.perMinute')}` : t('smtp.detail.unlimited')
+          }
+        />
+        <Fact label={t('smtp.col.lastSend')} value={formatDate(account.lastSuccessSendAt, locale.locale) ?? t('smtp.never')} />
+      </dl>
+
+      <div className="aih-detail__test">
+        <h3>
+          {t('smtp.detail.lastTest')}
+          {account.lastTestAt && <span className="aih-muted"> · {formatDate(account.lastTestAt, locale.locale)}</span>}
+        </h3>
+        {testResult ? (
+          <ConnectionTestResult result={testResult} onClose={onCloseTest} />
+        ) : account.lastTestOutcome ? (
+          <Badge tone={account.lastTestOutcome === 'passed' ? 'success' : 'danger'}>
+            {t(account.lastTestOutcome === 'passed' ? 'smtp.test.passed' : 'smtp.test.failed')}
+          </Badge>
+        ) : (
+          <p className="aih-muted">{t('smtp.detail.notTested')}</p>
+        )}
+      </div>
+
+      <div className="aih-row aih-row--wrap">
+        {canTest && (
+          <button
+            type="button"
+            className="aih-button aih-button--primary"
+            onClick={onTest}
+            disabled={busy}
+            aria-label={`${t('smtp.action.test')}: ${account.name}`}
+          >
+            {busy ? t('common.loading') : t('smtp.action.test')}
+          </button>
+        )}
+        {canSend && account.enabled && (
+          <button
+            type="button"
+            className="aih-button aih-button--ghost"
+            onClick={onSendTest}
+            aria-label={`${t('smtp.action.sendTest')}: ${account.name}`}
+          >
+            {t('smtp.action.sendTest')}
+          </button>
+        )}
+        {canWrite && (
+          <button
+            type="button"
+            className="aih-button aih-button--ghost"
+            onClick={() => navigation.navigate(`${basePath}/${account.id}/edit`)}
+            aria-label={`${t('smtp.action.edit')}: ${account.name}`}
+          >
+            {t('smtp.action.edit')}
+          </button>
+        )}
+        {canWrite && account.enabled && !account.isDefault && (
+          <button
+            type="button"
+            className="aih-button aih-button--ghost"
+            onClick={onMakeDefault}
+            aria-label={`${t('smtp.action.makeDefault')}: ${account.name}`}
+          >
+            {t('smtp.action.makeDefault')}
+          </button>
+        )}
+        {canWrite && (
+          <button
+            type="button"
+            className="aih-button aih-button--ghost"
+            onClick={onToggle}
+            aria-label={`${t(account.enabled ? 'smtp.action.disable' : 'smtp.action.enable')}: ${account.name}`}
+          >
+            {t(account.enabled ? 'smtp.action.disable' : 'smtp.action.enable')}
+          </button>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function Fact({ label, value }: { label: string; value: ReactNode }) {
+  return (
+    <div className="aih-fact">
+      <dt>{label}</dt>
+      <dd>{value}</dd>
     </div>
   );
 }

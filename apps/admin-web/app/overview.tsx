@@ -1,25 +1,19 @@
 'use client';
 
-import { useTranslation } from '@aka/integration-ui';
+import { IntegrationsHome, useTranslation } from '@aka/integration-ui';
 import type { SystemInfo } from './system-info';
 
 export function Overview({ systemInfo }: { systemInfo: SystemInfo | null }) {
   const t = useTranslation();
-  return (
-    <>
-      <h1>{t('overview.title')}</h1>
-      <section className="aih-card" aria-labelledby="api-status">
-        <h2 id="api-status">{t('overview.apiStatus')}</h2>
-        <p role="status">{systemInfo ? t('overview.apiUp') : t('overview.apiDown')}</p>
-        {systemInfo && (
-          <dl>
-            <dt>{t('overview.version')}</dt>
-            <dd>{systemInfo.version}</dd>
-            <dt>{t('overview.environment')}</dt>
-            <dd>{systemInfo.environment}</dd>
-          </dl>
-        )}
-      </section>
-    </>
+  const apiStatus = (
+    <span
+      role="status"
+      className={systemInfo ? 'aih-pill aih-pill--neutral' : 'aih-pill aih-pill--danger'}
+      title={systemInfo ? `${t('overview.version')} ${systemInfo.version} · ${systemInfo.environment}` : undefined}
+    >
+      <span className="aih-pill__dot" aria-hidden="true" />
+      {t('overview.apiStatus')}: {systemInfo ? t('overview.apiUp') : t('overview.apiDown')}
+    </span>
   );
+  return <IntegrationsHome headerExtra={apiStatus} />;
 }
