@@ -12,6 +12,7 @@ from starlette.applications import Starlette
 from aih_api.db import Database
 from aih_api.email.routes import router as email_router
 from aih_api.errors import install_error_handlers
+from aih_api.identity.deps import DEV_USER_HEADER
 from aih_api.identity.routes import router as identity_router
 from aih_api.identity.verifier import TokenVerifier
 from aih_api.infrastructure import Infrastructure, database_url
@@ -69,7 +70,14 @@ def create_app(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list(),
         allow_methods=["GET", "POST", "PATCH", "DELETE"],
-        allow_headers=["Authorization", "Content-Type", "If-Match", "Idempotency-Key", "X-Correlation-Id"],
+        allow_headers=[
+            "Authorization",
+            "Content-Type",
+            "If-Match",
+            "Idempotency-Key",
+            "X-Correlation-Id",
+            *([DEV_USER_HEADER] if settings.auth_dev_mode else []),
+        ],
         expose_headers=["X-Correlation-Id", "ETag"],
         max_age=600,
     )

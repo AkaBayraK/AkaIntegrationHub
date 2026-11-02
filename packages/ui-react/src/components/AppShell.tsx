@@ -10,6 +10,8 @@ export interface NavItem {
 
 export const DEFAULT_NAV_ITEMS: readonly NavItem[] = [
   { path: '/', labelKey: 'nav.dashboard' },
+  { path: '/admin/email/providers', labelKey: 'nav.emailProviders' },
+  { path: '/admin/email/deliveries', labelKey: 'nav.emailDeliveries' },
   { path: '/providers', labelKey: 'nav.providers' },
   { path: '/notifications', labelKey: 'nav.notifications' },
   { path: '/settings', labelKey: 'nav.settings' },
@@ -17,7 +19,16 @@ export const DEFAULT_NAV_ITEMS: readonly NavItem[] = [
 
 const LOCALES: readonly Locale[] = ['tr', 'en'];
 
-export function AppShell({ children, navItems = DEFAULT_NAV_ITEMS }: { children: ReactNode; navItems?: readonly NavItem[] }) {
+export function AppShell({
+  children,
+  navItems = DEFAULT_NAV_ITEMS,
+  headerExtra,
+}: {
+  children: ReactNode;
+  navItems?: readonly NavItem[];
+  /** Host uygulamaya dönüş bağlantısı gibi ek başlık içeriği. */
+  headerExtra?: ReactNode;
+}) {
   const { auth, locale, theme, navigation } = useAkaIntegration();
   const t = useTranslation();
   const nextTheme = theme.mode === 'dark' ? 'light' : 'dark';
@@ -31,6 +42,7 @@ export function AppShell({ children, navItems = DEFAULT_NAV_ITEMS }: { children:
         <div className="aih-shell__brand">
           <LogoMark size={28} />
           <span>{t('app.name')}</span>
+          {headerExtra}
         </div>
         <div className="aih-shell__actions">
           <label className="aih-field">
@@ -65,7 +77,9 @@ export function AppShell({ children, navItems = DEFAULT_NAV_ITEMS }: { children:
         <nav className="aih-shell__nav" aria-label={t('shell.mainNavigation')}>
           <ul>
             {navItems.map((item) => {
-              const active = navigation.currentPath === item.path;
+              const active =
+                navigation.currentPath === item.path ||
+                (item.path !== '/' && navigation.currentPath.startsWith(`${item.path}/`));
               return (
                 <li key={item.path}>
                   <a

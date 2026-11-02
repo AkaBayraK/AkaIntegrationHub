@@ -111,3 +111,20 @@ def test_dev_mode_cannot_be_enabled_in_prod() -> None:
 
     with pytest.raises(ValidationError, match="AIH_AUTH_DEV_MODE"):
         ApiSettings(environment="prod", auth_dev_mode=True)
+
+
+async def test_cors_preflight_allows_admin_web_origin(env: Env) -> None:
+    response = await env.api.options(
+        "/v1/me",
+        headers={
+            "Origin": "http://localhost:28030",
+            "Access-Control-Request-Method": "GET",
+            "Access-Control-Request-Headers": "authorization,x-aih-dev-user",
+        },
+    )
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://localhost:28030"
+    other = await env.api.options(
+        "/v1/me", headers={"Origin": "https://evil.example", "Access-Control-Request-Method": "GET"}
+    )
+    assert "access-control-allow-origin" not in other.headers
