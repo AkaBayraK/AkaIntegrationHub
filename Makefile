@@ -1,9 +1,9 @@
 COMPOSE = docker compose --env-file .env -f infra/docker/compose.yaml
 
-.PHONY: env up up-mail down api worker test web
+.PHONY: env up up-mail down sync api worker test lint web
 
 env:
-	@test -f .env || cp .env.example .env
+	@test -f .env || (cp .env.example .env && sed -i.bak "s|^AIH_SECRET_KEYS=$$|AIH_SECRET_KEYS=local:$$(python3 -c 'import base64,os;print(base64.urlsafe_b64encode(os.urandom(32)).decode())')|" .env && rm -f .env.bak)
 
 up: env
 	$(COMPOSE) up -d --wait
@@ -14,14 +14,20 @@ up-mail: env
 down:
 	$(COMPOSE) --profile dev-mail down
 
-api: env
-	set -a && . ./.env && set +a && mvn -pl apps/api -am spring-boot:run
+sync:
+	uv sync
 
-worker: env
-	set -a && . ./.env && set +a && mvn -pl apps/worker -am spring-boot:run
+api: env sync
+	set -a && . ./.env && set +a && uv run aih-api
 
-test:
-	mvn -B verify
+worker: env sync
+	set -a && . ./.env && set +a && uv run aih-worker
+
+test: sync
+	uv run pytest
+
+lint: sync
+	uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run lint-imports
 
 web:
 	npm run dev --workspace @aka/admin-web

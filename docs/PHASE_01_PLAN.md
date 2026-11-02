@@ -1,5 +1,7 @@
 # PHASE-01 — Foundation & Branding Uygulama Planı
 
+> Not: Bu plan Java/Spring Boot iskeleti içindir. Backend PHASE-01R ile Python/FastAPI'ye taşındı (ADR-0013).
+
 ## İş paketleri
 1. **Repo iskeleti:** Maven reactor (`pom.xml`), `modules/common`, `apps/api`, `apps/worker`; npm workspaces
    (`apps/admin-web`, `packages/ui-react`, `packages/design-tokens`).

@@ -16,7 +16,7 @@ Aka Integration Hub (AIH): bağımsız, multi-tenant, self-hosted veya SaaS olar
 10. Gerçek sağlayıcı credential'ı olmadan mock/sandbox adapter ile uçtan uca test edilebilir olmalı.
 
 ## Önerilen yığın (karar ADR ile doğrulanacak)
-Backend Java 21, Spring Boot, Spring Security, Spring Data JPA, PostgreSQL; Next.js + TypeScript + React + Tailwind + erişilebilir UI bileşenleri; Keycloak OIDC opsiyonel kimlik sağlayıcı; RabbitMQ veya uygun lisanslı alternatif; Valkey cache; OpenTelemetry + Prometheus + Grafana; Docker Compose; OpenAPI; Maven Central Java SDK ve NuGet .NET SDK. Kütüphane sürümlerini resmi kaynaklarla doğrula, otomatik en yeniye yükseltme.
+Backend Python + FastAPI, SQLAlchemy, Alembic, PostgreSQL (ADR-0013 ile önerildi; önceki öneri Java 21/Spring Boot idi); Next.js + TypeScript + React + Tailwind + erişilebilir UI bileşenleri; Keycloak OIDC opsiyonel kimlik sağlayıcı; RabbitMQ veya uygun lisanslı alternatif; Valkey cache; OpenTelemetry + Prometheus + Grafana; Docker Compose; OpenAPI; Maven Central Java SDK ve NuGet .NET SDK. Kütüphane sürümlerini resmi kaynaklarla doğrula, otomatik en yeniye yükseltme.
 
 ## Kapsam
 Provider registry, provider capability discovery, tenant/proje credential konfigürasyonu, SMS, SMTP ve e-posta API, WhatsApp, push, in-app, webhook, notification templates, preferences, consent, opt-out, quiet hours, locale/timezone, scheduling, batch, event-driven dispatch, retries/DLQ, fallback, quota/credit/cost, provider balance sync, top-up capability (yalnızca API destekliyorsa), usage ledger, billing, subscriptions, audit, observability, reports, systemadmin console, embed UI, Java/.NET SDK.

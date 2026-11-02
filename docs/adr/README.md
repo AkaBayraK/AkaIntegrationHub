@@ -6,7 +6,7 @@ Kabul edilmiş bir ADR değiştirilmez; yerine yenisi yazılır ve eskisi `Deği
 | No | Başlık | Durum |
 |---|---|---|
 | [0001](0001-modular-monolith.md) | Modüler monolit + ayrı worker | Önerildi |
-| [0002](0002-technology-stack.md) | Teknoloji yığını ve sürüm pinleri | Önerildi |
+| [0002](0002-technology-stack.md) | Teknoloji yığını ve sürüm pinleri | Önerildi (backend satırları 0013 ile değişmesi önerildi) |
 | [0003](0003-store-cache-broker-matrix.md) | PostgreSQL / Valkey / RabbitMQ sorumluluk matrisi | Önerildi |
 | [0004](0004-database-migrations.md) | Migration aracı: Flyway Community | Önerildi |
 | [0005](0005-multi-tenancy-isolation.md) | Multi-tenant izolasyon modeli | Önerildi |
@@ -17,3 +17,5 @@ Kabul edilmiş bir ADR değiştirilmez; yerine yenisi yazılır ve eskisi `Deği
 | [0010](0010-sdk-strategy.md) | Java / .NET / TypeScript SDK stratejisi | Önerildi |
 | [0011](0011-docs-as-code.md) | Docs-as-code mimarisi | Önerildi |
 | [0012](0012-observability.md) | Gözlemlenebilirlik yaklaşımı | Önerildi |
+| [0013](0013-python-backend.md) | Backend dili: Python (FastAPI) | Önerildi |
+| [0014](0014-mcp-ai-assistant.md) | MCP tabanlı AI yapılandırma asistanı | Önerildi |

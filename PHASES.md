@@ -8,6 +8,9 @@ Mevcut repoların entegrasyon gereksinimleri, deployment ve ürün stratejisi; S
 ## PHASE-01 — Foundation & Branding
 Repo, CI/CD, local Docker (PostgreSQL, Valkey, RabbitMQ), backend/web skeleton, health/readiness, migration altyapısı; Aka Integration Hub marka kılavuzu, özgün A-akış logo SVG, favicon, monochrome/dark/light ikonlar, design tokens, TR/EN. Kabul: tek komutla lokal start, sağlık testleri, temel login shell, marka varlıkları.
 
+## PHASE-01R — Backend Python Geçişi (önerildi)
+PHASE-01 backend iskeletinin Python/FastAPI ile yeniden yazılması; frontend, altyapı ve iş kuralları değişmez. Ayrıntılar: `docs/adr/0013-python-backend.md`, `docs/plans/PYTHON_MIGRATION_PLAN.md`. Kabul: PHASE-01 backend kabul kriterleri Python ile sağlanır, admin web değişmeden çalışır.
+
 ## PHASE-02 — Identity, Tenant & Project
 PlatformAdmin, TenantAdmin, ProjectAdmin, Operator, Viewer, ServiceAccount; tenant/project, OIDC/Keycloak, API key, RBAC, project scopes, invitation, tenant isolation, audit. Kabul: cross-tenant negatif testler, anahtar rotasyonu.
 
@@ -69,3 +72,6 @@ Valkey (BSD-3-Clause) varsayılan Redis-protokol uyumlu cache; Spring Data Redis
 Docusaurus tabanlı sürümlenmiş TR/EN portal; OpenAPI 3.1 + Swagger UI, Java/.NET/TS SDK quickstarts, React embed ve Storybook, SystemAdmin kullanım kılavuzları, provider setup, kontör/bakiye, security, multi-tenancy, runbook, troubleshooting, architecture C4/Mermaid, ADR, release notes, deployment SaaS/self-hosted, backup/restore. Docs-as-code ve CI link/schema/example checks. Kabul: sıfırdan Java ve .NET entegrasyonu yalnızca dokümanlarla demo ortamında çalışır.
 
 Not: PHASE-15 ve PHASE-16 numaraları önceki planla uyumlu ek aşamalardır; ancak Valkey ve docs-as-code altyapısı PHASE-01'de hazırlanmalı, cache kuralları PHASE-03/05/06/07'de ve API belgeleri her fazda uygulanmalıdır.
+
+## PHASE-17 — AI/MCP Yapılandırma Asistanı (önerildi)
+MCP sunucusu (`apps/mcp`) ile provider hesaplarının (SMTP, SMS, webhook, sonradan Kafka connector) yapay zekâ üzerinden taslak olarak tanımlanması, bağlantı testi ve insan onaylı aktivasyon. Secret'lar yapay zekâya gitmez; OAuth 2.1 tenant kapsamlı token, RBAC, SSRF allowlist, audit. Önkoşul: PHASE-02, PHASE-03, PHASE-04. Ayrıntılar: `docs/adr/0014-mcp-ai-assistant.md`. Kabul: cross-tenant negatif testler, secret sızıntı testleri, onaysız aktivasyonun mümkün olmadığının testi.

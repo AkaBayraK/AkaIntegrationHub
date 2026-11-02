@@ -31,8 +31,16 @@ export interface TenantAdapter {
   projectId: string | null;
 }
 
+export interface ApiAdapter {
+  /** Hub API kök adresi, ör. https://hub.example.com */
+  baseUrl: string;
+  /** Yalnız yerel geliştirme: "<tenant-slug>:<Rol>" (API'de AIH_AUTH_DEV_MODE açık olmalı). */
+  devUser?: string;
+}
+
 export interface AkaIntegrationAdapters {
   auth: AuthAdapter;
+  api?: ApiAdapter;
   locale: LocaleAdapter;
   theme: ThemeAdapter;
   navigation: NavigationAdapter;

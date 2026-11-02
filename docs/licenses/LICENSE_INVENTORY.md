@@ -20,19 +20,31 @@
 
 | Bileşen | Sürüm | SPDX | Kapsam | Durum |
 |---|---|---|---|---|
-| Spring Boot (starters) | 4.1.1 | Apache-2.0 | runtime | Doğrulandı |
-| Flyway Community | Boot BOM | Apache-2.0 | runtime | Doğrulandı |
-| springdoc-openapi | 3.x | Apache-2.0 | runtime | PHASE-02'de eklenecek |
-| PostgreSQL JDBC | Boot BOM | BSD-2-Clause | runtime | Doğrulandı |
-| Lettuce / Spring Data Redis | Boot BOM | MIT / Apache-2.0 | runtime | Doğrulandı |
-| Testcontainers | 2.x | MIT | test | Doğrulandı |
-| JUnit 5 | Boot BOM | EPL-2.0 | test (dağıtılmaz) | Doğrulandı |
+| CPython | 3.13 | PSF-2.0 | runtime | Doğrulandı |
+| FastAPI | 0.162.0 | MIT | runtime | Doğrulandı (PyPI, 2026-11-02) |
+| Starlette (FastAPI üzerinden) | uv.lock | BSD-3-Clause | runtime | Doğrulandı |
+| Uvicorn | 0.54.0 | BSD-3-Clause | runtime | Doğrulandı |
+| Pydantic / pydantic-settings | 2.14.2 / 2.16.2 | MIT | runtime | Doğrulandı |
+| SQLAlchemy | 2.1.6 | MIT | runtime | Doğrulandı |
+| asyncpg | 0.32.0 | Apache-2.0 | runtime | Doğrulandı |
+| Alembic | 1.20.1 | MIT | runtime | Doğrulandı |
+| redis-py | 8.1.0 | MIT | runtime | Doğrulandı |
+| aio-pika | 10.2.2 | Apache-2.0 | runtime | Doğrulandı |
+| structlog | 26.1.0 | MIT OR Apache-2.0 | runtime | Doğrulandı |
+| pytest / pytest-asyncio | 9.2.0 / 1.4.1.post1 | MIT / Apache-2.0 | test (dağıtılmaz) | Doğrulandı |
+| httpx | 0.28.1 | BSD-3-Clause | test | Doğrulandı |
+| testcontainers-python | 4.15.0 | Apache-2.0 | test | Doğrulandı |
+| ruff / mypy / import-linter | 0.17.3 / 2.4.1 / 2.15 | MIT / MIT / BSD-2-Clause | build | Doğrulandı |
+| cyclonedx-bom (Python) | 7.6.0 | Apache-2.0 | build | Doğrulandı |
+| PyJWT[crypto] | 2.15.1 | MIT | runtime | Doğrulandı |
+| cryptography | 50.0.2 | Apache-2.0 OR BSD-3-Clause | runtime | Doğrulandı |
+| aiosmtplib | 5.1.3 | MIT | runtime | Doğrulandı |
+| keycloak-js | 26.2.4 | Apache-2.0 | runtime (admin-web, OIDC) | Doğrulandı (npm, 2026-11-02) |
 | Next.js | 16.4.1 | MIT | runtime (web) | Doğrulandı |
 | React | 19.x | MIT | runtime (web) | Doğrulandı |
 | Tailwind CSS | 4.x | MIT | build | Eklenmedi (PHASE-08) |
 | TypeScript | 5.9.3 | Apache-2.0 | build | Doğrulandı |
 | Testing Library (react, jest-dom), jsdom | 16.3.3 / 7.0.1 / 30.1.3 | MIT | test | Doğrulandı |
-| CycloneDX Maven plugin | 2.9.1 | Apache-2.0 | build | Doğrulandı |
 | Vitest | 5.x | MIT | test | Doğrulandı |
 | Docusaurus | 3.x | MIT | docs (PHASE-16) | Doğrulandı |
 
