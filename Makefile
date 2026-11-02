@@ -29,8 +29,5 @@ test: sync
 lint: sync
 	uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run lint-imports
 
-test:
-	mvn -B verify
-
 web:
 	npm run dev --workspace @aka/admin-web
