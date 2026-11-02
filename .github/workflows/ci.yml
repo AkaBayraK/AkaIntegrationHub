@@ -14,23 +14,30 @@ concurrency:
 
 jobs:
   backend:
-    name: Backend (Java 21, Testcontainers)
+    name: Backend (Python 3.13, Testcontainers)
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-java@v5
+      - uses: astral-sh/setup-uv@v6
         with:
-          distribution: temurin
-          java-version: '21'
-          cache: maven
-      - name: Build and test
-        run: mvn -B -ntp verify
-      - name: Maven SBOM (CycloneDX)
-        run: mvn -B -ntp org.cyclonedx:cyclonedx-maven-plugin:2.9.1:makeAggregateBom -DoutputFormat=json -DoutputName=bom
+          python-version: '3.13'
+          enable-cache: true
+      - name: Install (locked)
+        run: uv sync --locked
+      - name: Lint, format, types, module boundaries
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+          uv run mypy
+          uv run lint-imports
+      - name: Test
+        run: uv run pytest
+      - name: Python SBOM (CycloneDX)
+        run: uv run cyclonedx-py environment --of JSON -o python-bom.json .venv
       - uses: actions/upload-artifact@v4
         with:
-          name: sbom-maven
-          path: target/bom.json
+          name: sbom-python
+          path: python-bom.json
 
   web:
     name: Web (typecheck, test, build)

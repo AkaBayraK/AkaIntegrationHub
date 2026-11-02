@@ -2,7 +2,7 @@
 
 1. Copy `.env.example` to `.env` (`make up` does it automatically) and change the passwords.
 2. `make up` — waits until PostgreSQL 17.6, Valkey 8.1.4 and RabbitMQ 4.1.4 are healthy.
-3. `make api` — on first start the API creates the `platform` schema through Flyway.
+3. `make api` — installs dependencies with `uv sync`; on first start the API creates the `platform` schema through Alembic.
 4. Readiness check: `curl localhost:28081/actuator/health/readiness` → `{"status":"UP"}`.
    Readiness is `UP` only when the database, Valkey and RabbitMQ are all reachable.
 5. `curl -H 'X-Correlation-Id: trial-0001' localhost:28080/v1/system/info` — the same correlation id is echoed back.

@@ -59,7 +59,7 @@ paketine import yasağı **import-linter** kontratlarıyla CI'da zorlanır. Her 
   - Spring Security, Spring Data, Actuator gibi hazır bileşenlerin karşılıkları elle birleştirilecek (auth, health, problem details).
   - PHASE-01 Java testleri (15 Maven testi) pytest eşdeğerleriyle yeniden yazılmalı; kabul kriterleri aynı kalır.
   - Java/.NET müşterileri için davranış SDK'lar üzerinden aynıdır; sözleşme testleri (OpenAPI diff) önemi artar.
-- Java kaynakları, Python eşdeğeri testleriyle birlikte yeşil olana kadar silinmez; silme ayrı bir PR'da yapılır.
+- Java kaynakları, Python eşdeğer testleri yeşil olduğu PHASE-01R PR'ında kaldırılır.
 
 ## Alternatifler
 - **Spring Boot'ta kalmak:** çalışan iskelet ve dokümanlarla tam uyum; MCP Spring AI ile de yazılabilir. Ürün sahibi

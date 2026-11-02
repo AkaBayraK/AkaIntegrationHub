@@ -2,7 +2,7 @@
 
 1. `.env.example` dosyasını `.env` olarak kopyalayın (`make up` bunu otomatik yapar) ve parolaları değiştirin.
 2. `make up` — PostgreSQL 17.6, Valkey 8.1.4 ve RabbitMQ 4.1.4 sağlıklı duruma gelene kadar bekler.
-3. `make api` — API ilk açılışta Flyway ile `platform` şemasını oluşturur.
+3. `make api` — `uv sync` ile bağımlılıkları kurar; API ilk açılışta Alembic ile `platform` şemasını oluşturur.
 4. Hazır olma kontrolü: `curl localhost:28081/actuator/health/readiness` → `{"status":"UP"}`.
    Readiness; veritabanı, Valkey ve RabbitMQ'nun hepsine erişilebildiğinde `UP` olur.
 5. `curl -H 'X-Correlation-Id: deneme-0001' localhost:28080/v1/system/info` — yanıt başlığında aynı korelasyon kimliği döner.
