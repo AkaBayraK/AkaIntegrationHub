@@ -18,7 +18,16 @@ export { type ApiAdapter } from './context';
 export { createHubClient, HubApiError, type HubClient, type HubClientOptions } from './api/client';
 export type * from './api/types';
 export { HubSessionProvider, useHubClient, useHubSession } from './session';
-export { SmtpAccountsPage, SMTP_BASE_PATH } from './components/smtp/SmtpAccountsPage';
+export { SmtpAccountsPage, SMTP_BASE_PATH, EMAIL_DELIVERIES_PATH } from './components/smtp/SmtpAccountsPage';
+export { IntegrationsHome, HealthBadge } from './components/integrations/IntegrationsHome';
+export {
+  INTEGRATION_TYPES,
+  IntegrationIcon,
+  smtpHealth,
+  type Health,
+  type IntegrationType,
+  type IntegrationTypeId,
+} from './components/integrations/catalog';
 export { SmtpAccountForm, validateSmtpForm } from './components/smtp/SmtpAccountForm';
 export { EmailDeliveriesPage } from './components/smtp/EmailDeliveriesPage';
 export { ConnectionTestResult } from './components/smtp/ConnectionTestResult';
