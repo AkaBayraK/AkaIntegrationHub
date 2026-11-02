@@ -1,6 +1,11 @@
 # Changelog
 
 ## [Unreleased]
+### PHASE-13 dilimi — BuildingFlow ve TraceFlow menü entegrasyonu
+- BuildingFlow "Yönetim > Entegrasyonlar" ve TraceFlow "Ayarlar > Entegrasyonlar" menüleri Hub SMTP ekranlarını açar
+  (AkaBayraK/BuildingFlow#118, AkaBayraK/TraceFlow#8). Ortak Keycloak SSO, her realm'de `aih-admin-web` public PKCE client'ı.
+- Kurulum ve tenant/rol eşlemesi: `docs/guides/tr/host-integration.md` (EN özet). TraceFlow dönüş origin'i `:3000` olarak düzeltildi.
+
 ### PHASE-08 dilimi — SMTP yönetim ekranları
 - `@aka/integration-ui`: tipli `HubClient` (problem+json → `HubApiError`, ETag/If-Match, Idempotency-Key), `HubSessionProvider`.
 - Ekranlar: SMTP hesap listesi, oluştur/düzenle formu (istemci tarafı doğrulama), bağlantı testi sonucu (adım adım),
