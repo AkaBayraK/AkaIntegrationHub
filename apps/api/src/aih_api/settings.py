@@ -33,6 +33,9 @@ class ApiSettings(BaseSettings):
     smtp_allow_private_hosts: bool = False
     smtp_allowed_ports: str = "25,465,587,2525"
     smtp_host_allowlist: str = ""
+    # Test e-postası için ek izinli alıcılar/alan adları (virgülle).
+    # Kendi adresiniz ve gönderen alan adı her zaman izinlidir.
+    smtp_test_recipient_allowlist: str = ""
 
     valkey_host: str = "localhost"
     valkey_port: int = 26379

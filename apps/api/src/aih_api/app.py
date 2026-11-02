@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.applications import Starlette
 
 from aih_api.db import Database
+from aih_api.email.routes import router as email_router
 from aih_api.errors import install_error_handlers
 from aih_api.identity.routes import router as identity_router
 from aih_api.identity.verifier import TokenVerifier
@@ -63,6 +64,7 @@ def create_app(
     app.include_router(system_router)
     app.include_router(identity_router)
     app.include_router(smtp_router)
+    app.include_router(email_router)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list(),
