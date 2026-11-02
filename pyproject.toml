@@ -34,6 +34,7 @@ asyncio_default_fixture_loop_scope = "session"
 asyncio_default_test_loop_scope = "session"
 testpaths = ["modules/common/tests", "apps/api/tests", "apps/worker/tests"]
 addopts = "--import-mode=importlib"
+pythonpath = ["apps/api/tests"]
 markers = ["integration: Docker (Testcontainers) gerektiren testler"]
 
 [tool.ruff]

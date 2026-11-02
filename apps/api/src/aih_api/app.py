@@ -6,9 +6,13 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.applications import Starlette
 
+from aih_api.db import Database
 from aih_api.errors import install_error_handlers
+from aih_api.identity.routes import router as identity_router
+from aih_api.identity.verifier import TokenVerifier
 from aih_api.infrastructure import Infrastructure, database_url
 from aih_api.migrations import upgrade_to_head
 from aih_api.settings import ApiSettings, get_settings
@@ -17,7 +21,11 @@ from aih_common.health import management_app
 from aih_common.middleware import CorrelationIdMiddleware
 
 
-def create_app(settings: ApiSettings | None = None, infra: Infrastructure | None = None) -> FastAPI:
+def create_app(
+    settings: ApiSettings | None = None,
+    infra: Infrastructure | None = None,
+    token_verifier: TokenVerifier | None = None,
+) -> FastAPI:
     settings = settings or get_settings()
     infra = infra or Infrastructure.create(settings)
 
@@ -40,8 +48,19 @@ def create_app(settings: ApiSettings | None = None, infra: Infrastructure | None
     )
     app.state.settings = settings
     app.state.infra = infra
+    app.state.db = Database(infra.engine)
+    app.state.token_verifier = token_verifier or TokenVerifier()
     install_error_handlers(app)
     app.include_router(system_router)
+    app.include_router(identity_router)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origin_list(),
+        allow_methods=["GET", "POST", "PATCH", "DELETE"],
+        allow_headers=["Authorization", "Content-Type", "If-Match", "Idempotency-Key", "X-Correlation-Id"],
+        expose_headers=["X-Correlation-Id", "ETag"],
+        max_age=600,
+    )
     app.add_middleware(CorrelationIdMiddleware)
     return app
 
