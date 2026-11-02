@@ -1,6 +1,14 @@
 # Changelog
 
 ## [Unreleased]
+### PHASE-04 dilimi — SMTP test e-postası ve Mailpit
+- `POST /v1/tenants/{tenantId}/smtp-accounts/{accountId}/send-test-email`: `confirm: true` ve `Idempotency-Key` zorunlu;
+  aynı anahtar + aynı istek → aynı kayıt (ikinci gönderim yok), farklı istek → 409.
+- Test alıcısı kısıtı: kendi adresiniz, gönderen alan adı veya `AIH_SMTP_TEST_RECIPIENT_ALLOWLIST`; Mailpit hesapları serbest.
+- `email.deliveries` / `email.delivery_attempts` (RLS); durumlar `sending` → `accepted_by_smtp` / `failed`
+  (SMTP kabulü teslimat kanıtı değildir); `GET .../email-deliveries` ve `.../{deliveryId}`.
+- Gönderim, kayıt transaction'ı commit edildikten sonra yapılır; sonuç ayrı transaction'da işlenir ve audit'e yazılır.
+
 ### PHASE-03 dilimi — SMTP hesap tanımı ve bağlantı testi
 - `provider.smtp_accounts`, `provider.smtp_connection_tests`, şifreli `provider.secrets` (Fernet, anahtar rotasyonlu `AIH_SECRET_KEYS`).
 - PostgreSQL RLS (`FORCE`) + transaction'a özel `aih_app` rolü: tenant bağlamı olmadan satır görünmez.
