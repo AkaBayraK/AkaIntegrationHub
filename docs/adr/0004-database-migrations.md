@@ -2,6 +2,8 @@
 
 **Durum:** Önerildi · **Faz:** PHASE-00
 
+> Not: PHASE-01R ile migration aracı Alembic (MIT) olarak değiştirildi; bkz. ADR-0013.
+
 ## Bağlam
 Migration geri alınabilir ya da forward-fix stratejisi belgelenmiş olmalı (AGENTS.md). Araç ürünle birlikte müşteri
 ortamına dağıtılacak.

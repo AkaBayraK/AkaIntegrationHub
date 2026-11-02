@@ -1,0 +1,50 @@
+"""API ve yönetim (health) uygulama fabrikaları."""
+
+from __future__ import annotations
+
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+from starlette.applications import Starlette
+
+from aih_api.errors import install_error_handlers
+from aih_api.infrastructure import Infrastructure, database_url
+from aih_api.migrations import upgrade_to_head
+from aih_api.settings import ApiSettings, get_settings
+from aih_api.system import router as system_router
+from aih_common.health import management_app
+from aih_common.middleware import CorrelationIdMiddleware
+
+
+def create_app(settings: ApiSettings | None = None, infra: Infrastructure | None = None) -> FastAPI:
+    settings = settings or get_settings()
+    infra = infra or Infrastructure.create(settings)
+
+    @asynccontextmanager
+    async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+        if settings.migrate_on_startup:
+            await upgrade_to_head(database_url(settings))
+        await infra.connect_rabbit(settings)
+        try:
+            yield
+        finally:
+            await infra.close()
+
+    app = FastAPI(
+        title="Aka Integration Hub API",
+        version="0.1.0",
+        lifespan=lifespan,
+        docs_url="/docs" if settings.environment != "prod" else None,
+        redoc_url=None,
+    )
+    app.state.settings = settings
+    app.state.infra = infra
+    install_error_handlers(app)
+    app.include_router(system_router)
+    app.add_middleware(CorrelationIdMiddleware)
+    return app
+
+
+def create_management_app(infra: Infrastructure) -> Starlette:
+    return management_app({"db": infra.check_db, "redis": infra.check_valkey, "rabbit": infra.check_rabbit})

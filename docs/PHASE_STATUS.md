@@ -4,7 +4,7 @@
 |---|---|---|
 | PHASE-00 | Onay bekliyor | 12 ADR, lisans envanteri, tehdit modeli, risk listesi |
 | PHASE-01 | Onay bekliyor | Backend/worker iskeleti, Docker Compose, UI paketi, admin kabuğu, marka, CI |
-| PHASE-01R | Plan onay bekliyor | Backend'in Python/FastAPI'ye taşınması (ADR-0013, `docs/plans/PYTHON_MIGRATION_PLAN.md`) |
+| PHASE-01R | Onay bekliyor | Backend Python/FastAPI ile yeniden yazıldı; 23 pytest testi yeşil (ADR-0013, #33) |
 | PHASE-02 | Başlamadı | Identity, Tenant & Project |
 
 ## PHASE-01 özeti

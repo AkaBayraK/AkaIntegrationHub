@@ -1,6 +1,6 @@
 # PHASE-01R — Backend'in Python'a taşınma planı
 
-**Durum:** Plan, onay bekliyor · **İlgili:** ADR-0013, ADR-0014 · Bu PR kod değiştirmez.
+**Durum:** Uygulandı (PHASE-01R, issue #33) · **İlgili:** ADR-0013, ADR-0014
 
 ## Amaç
 PHASE-01'in backend kabul kriterlerini Python/FastAPI ile aynen sağlamak. Frontend, altyapı ve iş kuralları değişmez.
@@ -14,7 +14,7 @@ PHASE-01'in backend kabul kriterlerini Python/FastAPI ile aynen sağlamak. Front
 | `CorrelationIdFilter` + `CorrelationIds` | ASGI middleware + `contextvars` | Header üretimi/taşınması ve doğrulama testleri |
 | `GlobalExceptionHandler` + `ApiErrorCode` | Exception handler'lar, `application/problem+json`, aynı `AIH-COMMON-xxx` kodları | Stacktrace ve iç mesaj sızmaz |
 | `PlatformProperties`, `application.yml` | pydantic-settings; aynı `AIH_*` değişkenleri ve portlar | `.env.example` aynı kalır |
-| Actuator liveness/readiness (db, redis, rabbit) | Ayrı yönetim portunda `/health/liveness`, `/health/readiness` | Bağımlılık düşünce readiness `DOWN` |
+| Actuator liveness/readiness (db, redis, rabbit) | Ayrı yönetim portunda aynı yollar: `/actuator/health/liveness`, `/actuator/health/readiness` | Bağımlılık düşünce readiness `DOWN` (503) |
 | Flyway `V202610151200__create_platform_schema.sql` | Alembic ilk revizyonu (aynı SQL) | Mevcut veritabanında tekrar çalışmaz, şema aynı |
 | `aih-worker` (RabbitMQ health) | `aih_worker` (aio-pika bağlantısı + health) | Readiness RabbitMQ'ya bağlı |
 | JUnit + Testcontainers (15 test) | pytest + testcontainers-python | Eşdeğer senaryolar yeşil |
@@ -28,7 +28,7 @@ PHASE-01'in backend kabul kriterlerini Python/FastAPI ile aynen sağlamak. Front
 5. `apps/worker`: RabbitMQ bağlantısı ve health.
 6. `Makefile` (`api`, `worker`, `test`), CI backend işi (Python kurulum, uv, test, CycloneDX Python SBOM), lisans envanteri.
 7. Dokümanlar: getting-started TR/EN, ADR-0002/0004 işaretleri, `PHASE_STATUS.md`.
-8. Python tarafı yeşil olduktan sonra ayrı PR ile Java kaynakları (`pom.xml`, `apps/*/src/main/java`, `modules/common/src`) kaldırılır.
+8. Java kaynakları aynı PR'da kaldırıldı: Python eşdeğer testleri (23) yeşil olduğu için iki yığını paralel tutmanın faydası yoktu.
 
 ## Açık sorular
 - Python 3.13 mü 3.14 mü? (Öneri: 3.13; 3.14 CI matrisinde)

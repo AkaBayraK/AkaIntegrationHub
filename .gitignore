@@ -13,3 +13,10 @@ coverage/
 *.log
 *.tsbuildinfo
 next-env.d.ts
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+python-bom.json
