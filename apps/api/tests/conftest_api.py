@@ -13,6 +13,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 
 from aih_api.app import create_app, create_management_app
 from aih_api.infrastructure import Infrastructure
+from aih_api.secrets import SecretCipher
 from aih_api.settings import ApiSettings
 from aih_api.tenancy import service as tenancy
 from aih_api.tenancy.models import IdentityProvider
@@ -65,6 +66,8 @@ def settings(postgres: Any, valkey: Any, rabbitmq: Any) -> ApiSettings:
         valkey_host=valkey.host,
         valkey_port=valkey.port,
         auth_dev_mode=True,
+        secret_keys=f"k1:{SecretCipher.generate_key()}",
+        smtp_allow_private_hosts=True,
         rabbitmq=RabbitSettings(host=rabbitmq.host, port=rabbitmq.port, user="aih", password="test-only", vhost="aih"),
     )
 

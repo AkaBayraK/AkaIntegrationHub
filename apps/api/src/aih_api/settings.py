@@ -27,6 +27,13 @@ class ApiSettings(BaseSettings):
     # Admin web ve host uygulamaların (BuildingFlow, TraceFlow) tarayıcıdan erişeceği origin'ler (virgülle).
     cors_origins: str = "http://localhost:28030"
 
+    # Secret şifreleme anahtarları: "kid:<fernet-key>[,kid:<eski-key>]" (ilk anahtar birincil).
+    secret_keys: str = ""
+    # SMTP hedef politikası (SSRF). Özel ağ yalnız local/dev/test'te açılabilir (Mailpit için).
+    smtp_allow_private_hosts: bool = False
+    smtp_allowed_ports: str = "25,465,587,2525"
+    smtp_host_allowlist: str = ""
+
     valkey_host: str = "localhost"
     valkey_port: int = 26379
     valkey_password: str = ""
@@ -47,6 +54,10 @@ class ApiSettings(BaseSettings):
     def _dev_mode_only_locally(self) -> ApiSettings:
         if self.auth_dev_mode and self.environment not in ("local", "test"):
             raise ValueError("AIH_AUTH_DEV_MODE yalnız local/test ortamında etkinleştirilebilir")
+        if self.smtp_allow_private_hosts and self.environment in ("staging", "prod"):
+            raise ValueError("AIH_SMTP_ALLOW_PRIVATE_HOSTS staging/prod ortamında etkinleştirilemez")
+        if self.environment in ("staging", "prod") and not self.secret_keys:
+            raise ValueError("AIH_SECRET_KEYS staging/prod ortamında zorunludur")
         return self
 
     def cors_origin_list(self) -> list[str]:

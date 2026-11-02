@@ -15,6 +15,9 @@ from aih_api.identity.routes import router as identity_router
 from aih_api.identity.verifier import TokenVerifier
 from aih_api.infrastructure import Infrastructure, database_url
 from aih_api.migrations import upgrade_to_head
+from aih_api.providers.smtp.network import NetworkPolicy
+from aih_api.providers.smtp.routes import router as smtp_router
+from aih_api.secrets import SecretCipher, SecretStore
 from aih_api.settings import ApiSettings, get_settings
 from aih_api.system import router as system_router
 from aih_common.health import management_app
@@ -50,9 +53,16 @@ def create_app(
     app.state.infra = infra
     app.state.db = Database(infra.engine)
     app.state.token_verifier = token_verifier or TokenVerifier()
+    app.state.secret_store = SecretStore(SecretCipher(settings.secret_keys))
+    app.state.smtp_policy = NetworkPolicy(
+        allow_private=settings.smtp_allow_private_hosts,
+        allowed_ports=frozenset(int(p) for p in settings.smtp_allowed_ports.split(",") if p.strip()),
+        host_allowlist=tuple(h.strip().lower() for h in settings.smtp_host_allowlist.split(",") if h.strip()),
+    )
     install_error_handlers(app)
     app.include_router(system_router)
     app.include_router(identity_router)
+    app.include_router(smtp_router)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list(),
