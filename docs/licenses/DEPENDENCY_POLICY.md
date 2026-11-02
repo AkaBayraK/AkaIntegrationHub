@@ -1,6 +1,6 @@
 # Bağımlılık ve SBOM Politikası
 
-Kaynak kural: kök dizindeki `LICENSE_POLICY.md`. Bu dosya CI'da nasıl uygulandığını tanımlar.
+Kaynak kural: `docs/licenses/LICENSE_POLICY.md`. Bu dosya CI'da nasıl uygulandığını tanımlar.
 
 ## İzin listesi (otomatik geçer)
 Apache-2.0, MIT, BSD-2-Clause, BSD-3-Clause, ISC, PostgreSQL, 0BSD, Unicode-DFS-2016, CC0-1.0, Python-2.0 (yalnızca build).

@@ -1,6 +1,6 @@
 # ADR-0012 — Gözlemlenebilirlik yaklaşımı
 
-**Durum:** Önerildi · **Faz:** PHASE-00 (temel PHASE-01, tam kapsam PHASE-10) · **İlgili:** `OBSERVABILITY_DESIGN.md`, `OTEL_COLLECTOR_DESIGN.md`
+**Durum:** Önerildi · **Faz:** PHASE-00 (temel PHASE-01, tam kapsam PHASE-10) · **İlgili:** `docs/design/OBSERVABILITY_DESIGN.md`, `docs/design/OTEL_COLLECTOR_DESIGN.md`
 
 ## Karar
 - PHASE-01'den itibaren: Spring Boot Actuator `health` (liveness/readiness grupları), yapılandırılmış JSON log,

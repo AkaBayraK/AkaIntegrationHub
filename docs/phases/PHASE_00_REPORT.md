@@ -21,7 +21,7 @@
 - ADR-0001 … ADR-0012 (`docs/adr`)
 - Lisans envanteri ve bağımlılık politikası (`docs/licenses`)
 - Tehdit modeli (`docs/security/THREAT_MODEL.md`)
-- PHASE-01 uygulama planı (`docs/PHASE_01_PLAN.md`)
+- PHASE-01 uygulama planı (`docs/phases/PHASE_01_PLAN.md`)
 
 ## Kabul kriterleri
 | Kriter | Durum |

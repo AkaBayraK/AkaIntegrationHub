@@ -1,6 +1,6 @@
 # ADR-0003 — PostgreSQL / Valkey / RabbitMQ sorumluluk matrisi
 
-**Durum:** Önerildi · **Faz:** PHASE-00 · **İlgili:** `CACHE_VALKEY_DESIGN.md`
+**Durum:** Önerildi · **Faz:** PHASE-00 · **İlgili:** `docs/design/CACHE_VALKEY_DESIGN.md`
 
 ## Karar
 

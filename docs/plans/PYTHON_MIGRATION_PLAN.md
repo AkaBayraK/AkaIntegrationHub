@@ -27,7 +27,7 @@ PHASE-01'in backend kabul kriterlerini Python/FastAPI ile aynen sağlamak. Front
 4. Alembic: mevcut Flyway SQL'ini ilk revizyon olarak taşı; Flyway geçmiş tablosu olan ortamlarda `alembic stamp` notu.
 5. `apps/worker`: RabbitMQ bağlantısı ve health.
 6. `Makefile` (`api`, `worker`, `test`), CI backend işi (Python kurulum, uv, test, CycloneDX Python SBOM), lisans envanteri.
-7. Dokümanlar: getting-started TR/EN, ADR-0002/0004 işaretleri, `PHASE_STATUS.md`.
+7. Dokümanlar: getting-started TR/EN, ADR-0002/0004 işaretleri, `docs/phases/PHASE_STATUS.md`.
 8. Java kaynakları aynı PR'da kaldırıldı: Python eşdeğer testleri (23) yeşil olduğu için iki yığını paralel tutmanın faydası yoktu.
 
 ## Açık sorular

@@ -1,7 +1,7 @@
 # AGENTS — AKA INTEGRATION HUB
 
 ## Çalışma protokolü
-- Her iş başlangıcında MASTER_PROMPT.md ve PHASES.md oku.
+- Her iş başlangıcında `docs/process/MASTER_PROMPT.md` ve `docs/phases/PHASES.md` oku.
 - Kullanıcı hangi fazı istediyse sadece onu uygula. Önce planı ve etkilenecek dosyaları göster; kritik/geri döndürülemez değişiklikte onay iste.
 - Her adımı Türkçe bildir: `[FAZ 04][ADIM 2/7][DEVAM] SMTP adapter kontratı oluşturuluyor`.
 - Aşama sonunda: değişen dosyalar, çalıştırılan komutlar, test sonuçları, başarısız testler, açık riskler, sonraki faz, onay bekleniyor.
@@ -31,15 +31,15 @@ apps/api, apps/worker, apps/admin-web, packages/ui-react, packages/ts-client, sd
 - Lisans ve transitive dependency denetimi CI kapısıdır; lisans garantisi verilmez.
 
 ## Observability görevi
-PHASE-10 çalışmasında `OBSERVABILITY_DESIGN.md` dosyasını oku. Her alt adımı Türkçe konsola yaz, tek alt adım uygula, test et ve onay bekle. Mevcut dosyaları izinsiz ezme.
+PHASE-10 çalışmasında `docs/design/OBSERVABILITY_DESIGN.md` dosyasını oku. Her alt adımı Türkçe konsola yaz, tek alt adım uygula, test et ve onay bekle. Mevcut dosyaları izinsiz ezme.
 
 ## V4 OTel Collector
-PHASE-10.2 sırasında `OTEL_COLLECTOR_DESIGN.md` belgesini oku; receiver/processor/exporter sinyal ayrımını doğrula. Var olan compose, environment ve auth ayarlarını ezme.
+PHASE-10.2 sırasında `docs/design/OTEL_COLLECTOR_DESIGN.md` belgesini oku; receiver/processor/exporter sinyal ayrımını doğrula. Var olan compose, environment ve auth ayarlarını ezme.
 
 ## Öncelikli kalite ve token protokolü (v2 ek)
-- Önce `TOKEN_OPTIMIZATION.md`, `PHASE_EXECUTION_PROTOCOL.md` içindeki kısa yürütme kurallarını uygula; ilgili riskte `LICENSE_POLICY.md`, `SECURITY_STANDARDS.md`, `CODING_STANDARDS.md`, `PERFORMANCE_RULES.md` başlıklarına başvur.
+- Önce `docs/standards/TOKEN_OPTIMIZATION.md`, `docs/process/PHASE_EXECUTION_PROTOCOL.md` içindeki kısa yürütme kurallarını uygula; ilgili riskte `docs/licenses/LICENSE_POLICY.md`, `docs/standards/SECURITY_STANDARDS.md`, `docs/standards/CODING_STANDARDS.md`, `docs/standards/PERFORMANCE_RULES.md` başlıklarına başvur.
 - Fazların iş mantığını, mevcut kodu ve mevcut dosyaları koru; eski kurallarla çelişirse daha güvenli, dar kapsamlı ve açık onay gerektiren kural geçerlidir.
-- `MASTER_PROMPT.md` ve `PHASES.md` dosyalarını her alt adımda yeniden okumak zorunda değilsin; yalnız ilgili bölümü oku.
+- `docs/process/MASTER_PROMPT.md` ve `docs/phases/PHASES.md` dosyalarını her alt adımda yeniden okumak zorunda değilsin; yalnız ilgili bölümü oku.
 - Yeni dependency eklemeden lisans kontrolü ve eşdeğer mevcut çözüm araştırması yap.
 - Aynı işlev için mükerrer method, servis, component veya veri erişim katmanı oluşturma.
 - Testleri hedefli çalıştır; tüm suite'i yalnız risk gerektirirse çalıştır.

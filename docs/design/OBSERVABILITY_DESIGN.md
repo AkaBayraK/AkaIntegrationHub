@@ -57,7 +57,7 @@ Tüm bileşen ve exporter sürümleri PHASE-00 lisans kapısından geçer. Grafa
 - `docker compose --profile observability up -d` ile gerekli servisler (ilgili compose tanımında) ayağa kalkar.
 
 ## V4 eki
-Collector yapılandırması, pipeline, failure mode ve acceptance kriterleri için `OTEL_COLLECTOR_DESIGN.md` belgesine bak. PHASE-10.2 başlamadan hiçbir mevcut container, env veya endpoint ezilmez.
+Collector yapılandırması, pipeline, failure mode ve acceptance kriterleri için `docs/design/OTEL_COLLECTOR_DESIGN.md` belgesine bak. PHASE-10.2 başlamadan hiçbir mevcut container, env veya endpoint ezilmez.
 
 ## V5 eki — Blackbox Exporter
-Dışarıdan erişilebilirlik kontrolleri PHASE-10.10 kapsamında `BLACKBOX_EXPORTER_DESIGN.md` belgesinde tanımlıdır. Blackbox, gönderim başarısını veya iş akışının doğruluğunu tek başına kanıtlamaz.
+Dışarıdan erişilebilirlik kontrolleri PHASE-10.10 kapsamında `docs/design/BLACKBOX_EXPORTER_DESIGN.md` belgesinde tanımlıdır. Blackbox, gönderim başarısını veya iş akışının doğruluğunu tek başına kanıtlamaz.

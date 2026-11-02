@@ -4,7 +4,7 @@
 
 ## Logo
 Özgün "A-akış" işareti: yükselen iki kol bir "A" oluşturur, ortadaki dalgalı turkuaz çizgi veri akışını ve bağlantıyı
-temsil eder. `BRAND_CONCEPT.png` yalnızca ilham kaynağıdır; buradaki vektörler sıfırdan çizilmiştir.
+temsil eder. `docs/brand/BRAND_CONCEPT.png` yalnızca ilham kaynağıdır; buradaki vektörler sıfırdan çizilmiştir.
 
 | Dosya | Kullanım |
 |---|---|

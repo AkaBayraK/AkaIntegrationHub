@@ -40,8 +40,8 @@ yapılabilmesini istiyor. Örnek: "Tenant X için Microsoft 365 SMTP hesabı ekl
   değiştiremez. Redis Server lisans kısıtı ADR-0003'te geçerlidir.
 
 ## Güvenlik
-- **SSRF:** host/port alanları sunucu tarafında allowlist ve özel ağ kısıtıyla doğrulanır (`SMTP_ADMIN_UI_DESIGN.md`
-  ve `BLACKBOX_EXPORTER_DESIGN.md` kuralları). Yapay zekânın önerdiği host da aynı kontrolden geçer.
+- **SSRF:** host/port alanları sunucu tarafında allowlist ve özel ağ kısıtıyla doğrulanır (`docs/design/SMTP_ADMIN_UI_DESIGN.md`
+  ve `docs/design/BLACKBOX_EXPORTER_DESIGN.md` kuralları). Yapay zekânın önerdiği host da aynı kontrolden geçer.
 - **Prompt injection:** araç çıktıları (sağlayıcı hata mesajları dahil) maskeli ve kısaltılmış döner; araçlar
   rol ve tenant kapsamını aşan işlem yapamaz; yıkıcı araç yoktur (silme yok, yalnızca pasifleştirme).
 - Araç başına rate limit, kısa ömürlü token, deny-by-default. Viewer rolü yalnızca okuma araçlarını görür.

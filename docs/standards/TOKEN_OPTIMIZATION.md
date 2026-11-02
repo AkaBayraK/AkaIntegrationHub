@@ -8,5 +8,5 @@
 - Komut çıktısını filtrele/özetle; yalnız hata bağlamını göster. Gereksiz tam log, stack trace ve tekrar deneme yok.
 - Başarısız komutu aynı parametreyle kontrolsüz tekrarlama; kök neden incele ve sınırlı yeniden dene.
 - Kısa Türkçe konsol: `[FAZ NN][ADIM x/y] eylem — sonuç`; gereksiz uzun düşünce/analiz dökümü yok.
-- Faz sonunda `docs/PHASE_STATUS.md` içine kompakt özet: tamamlananlar, dosyalar, testler, açık risk, sıradaki faz. Gizli bilgi yazma.
+- Faz sonunda `docs/phases/PHASE_STATUS.md` içine kompakt özet: tamamlananlar, dosyalar, testler, açık risk, sıradaki faz. Gizli bilgi yazma.
 - Token sayısı/limitini ortam göstermiyorsa uydurma; verimlilik garantisi veya belirli yüzde tasarruf iddia etme.

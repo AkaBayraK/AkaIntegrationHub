@@ -68,5 +68,5 @@
 | Grafana/Loki/Tempo | AGPL-3.0 — hukuk onayına kadar yalnızca opsiyonel dev profili planlanır |
 
 ## Marka varlıkları
-- `BRAND_CONCEPT.png` yalnızca referanstır; PHASE-01'deki SVG logo özgün olarak elle çizilir. Font olarak sistem
+- `docs/brand/BRAND_CONCEPT.png` yalnızca referanstır; PHASE-01'deki SVG logo özgün olarak elle çizilir. Font olarak sistem
   font yığını kullanılır (ek font lisansı yok). Marka adı/alan adı tescil araştırması **yapılmadı** (risk R-01).

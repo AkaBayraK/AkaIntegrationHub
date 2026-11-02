@@ -15,10 +15,10 @@ PHASE-01 backend iskeletinin Python/FastAPI ile yeniden yazılması; frontend, a
 PlatformAdmin, TenantAdmin, ProjectAdmin, Operator, Viewer, ServiceAccount; tenant/project, OIDC/Keycloak, API key, RBAC, project scopes, invitation, tenant isolation, audit. Kabul: cross-tenant negatif testler, anahtar rotasyonu.
 
 ## PHASE-03 — Provider Registry & Adapter SDK
-Provider türleri/capabilities, credentials secret refs, account configuration, adapter SPI, connection tests, enable/disable, priorities, health, sandbox. SMTP tenant/proje bazlı hesaplar, gerçek provider credential secret refs, bağlantı testi, varsayılan/yedek hesap ve OAuth2/SMTP AUTH yetenekleri `SMTP_MAILPIT_DESIGN.md` kapsamında. Kabul: mock provider ekleme ve yeni hesap UI/API üzerinden tanımlama.
+Provider türleri/capabilities, credentials secret refs, account configuration, adapter SPI, connection tests, enable/disable, priorities, health, sandbox. SMTP tenant/proje bazlı hesaplar, gerçek provider credential secret refs, bağlantı testi, varsayılan/yedek hesap ve OAuth2/SMTP AUTH yetenekleri `docs/design/SMTP_MAILPIT_DESIGN.md` kapsamında. Kabul: mock provider ekleme ve yeni hesap UI/API üzerinden tanımlama.
 
 ## PHASE-04 — SMS & Email Channels
-SMS send/status/callback, SMTP TLS/auth, e-posta API adapter, sender identity, attachments policy, DKIM/SPF/DMARC kurulum rehberi, provider-specific error mapping. Mailpit yalnızca dev/test için; gerçek SMTP production adapter ayrıdır. Ayrıntılar: `SMTP_MAILPIT_DESIGN.md`. Kabul: sandbox uçtan uca gönderim, teslim durumları ve güvenlik testleri.
+SMS send/status/callback, SMTP TLS/auth, e-posta API adapter, sender identity, attachments policy, DKIM/SPF/DMARC kurulum rehberi, provider-specific error mapping. Mailpit yalnızca dev/test için; gerçek SMTP production adapter ayrıdır. Ayrıntılar: `docs/design/SMTP_MAILPIT_DESIGN.md`. Kabul: sandbox uçtan uca gönderim, teslim durumları ve güvenlik testleri.
 
 ## PHASE-05 — Notification Core
 Notification API, event/outbox, templates TR/EN, variables/schema validation, preview, per-user preferences, transactional/marketing separation, consent, opt-out, quiet hours, scheduling, bulk, in-app inbox. Kabul: idempotent send, template versioning, izin testleri.
@@ -30,13 +30,13 @@ RabbitMQ durable queue, worker, retry/backoff/jitter, DLQ, throttling, provider 
 Provider balance API sync, local credit ledger, tenant/project quotas, cost estimation, alerts, manual adjustment with approval, provider top-up only if officially supported, reconciliation, currency/tax placeholders. Kabul: ledger concurrency/idempotency, balance discrepancy alerts.
 
 ## PHASE-08 — Admin Console & Embeddable UI
-Standalone Next.js admin, reusable @aka/integration-ui React components; providers, SMS, SMTP, balance, templates, send logs, routing, tenants, reports; host auth/locale/theme/menu adapters; accessibility. SMTP Hesapları, SMTP Hesap Tanımı/Test, Gönderim Geçmişi ve Mailpit Test Gelen Kutusu ekran şartnamesi: `SMTP_ADMIN_UI_DESIGN.md`. Kabul: demo embed in isolated BuildingFlow/TraceFlow shells without duplicating business logic.
+Standalone Next.js admin, reusable @aka/integration-ui React components; providers, SMS, SMTP, balance, templates, send logs, routing, tenants, reports; host auth/locale/theme/menu adapters; accessibility. SMTP Hesapları, SMTP Hesap Tanımı/Test, Gönderim Geçmişi ve Mailpit Test Gelen Kutusu ekran şartnamesi: `docs/design/SMTP_ADMIN_UI_DESIGN.md`. Kabul: demo embed in isolated BuildingFlow/TraceFlow shells without duplicating business logic.
 
 ## PHASE-09 — Java/.NET/TypeScript SDKs
 Java Maven SDK, .NET NuGet SDK, TS client; OpenAPI generation plus handwritten ergonomic facades, retries/timeouts, idempotency, auth, correlation, samples, semantic versioning. Kabul: Java Spring Boot ve ASP.NET Core örneklerinden mock notification.
 
 ## PHASE-10 — Monitoring, Observability, Audit & Reporting (OTel Collector + Prometheus + Blackbox Exporter)
-Amaç: Aka Integration Hub ve entegre Java/.NET projeleri için metrics, logs, traces ve alarm yönetimini, mevcut iş akışlarını bozmadan sağlamak. Ayrıntılar: `OBSERVABILITY_DESIGN.md`, `OTEL_COLLECTOR_DESIGN.md` ve `BLACKBOX_EXPORTER_DESIGN.md`.
+Amaç: Aka Integration Hub ve entegre Java/.NET projeleri için metrics, logs, traces ve alarm yönetimini, mevcut iş akışlarını bozmadan sağlamak. Ayrıntılar: `docs/design/OBSERVABILITY_DESIGN.md`, `docs/design/OTEL_COLLECTOR_DESIGN.md` ve `docs/design/BLACKBOX_EXPORTER_DESIGN.md`.
 
 Her alt faz: analiz → etki analizi → dosya planı → onay → uygulama → test → dokümantasyon → onay. Bir çalıştırmada yalnızca bir alt faz.
 
@@ -48,7 +48,7 @@ Her alt faz: analiz → etki analizi → dosya planı → onay → uygulama → 
 - **10.6 Distributed tracing — Tempo:** API → outbox → worker → provider için W3C tracecontext, messaging propagation, Collector OTLP traces → Tempo, sampling, latency ve error traces.
 - **10.7 Alerts — Alertmanager:** Provider down, 5xx/p95, worker/DLQ, collector dropped/refused telemetry, exporter/scrape down, storage pressure, credit thresholds; alarm döngüsü ve self-dependency koruması.
 - **10.8 Audit & Reporting:** PostgreSQL'de audit/transaction system-of-record; tenant/project scoped raporlar, CSV/Excel/PDF, SLA/usage/spend; Prometheus audit kaynağı değildir.
-- **10.10 Blackbox Exporter — External Health Checks:** HTTP/HTTPS, TCP, DNS, ICMP (izin verilen ortamlarda) probe modülleri; TLS sertifika bitişi, yanıt süresi, DNS çözümleme ve erişilebilirlik; Prometheus multi-target scrape, Grafana service-health dashboard, Alertmanager alarmları. Ayrıntılar: `BLACKBOX_EXPORTER_DESIGN.md`. SSRF ve iç ağ taraması riskine karşı sabit allowlist, özel ağ erişim kısıtları, kullanıcı girdisinden serbest URL almama, yetkili admin değişiklikleri ve audit zorunludur. SMS/SMTP gerçek teslimatını doğrulamaz; provider adapter başarısı ayrı metriklerden izlenir.
+- **10.10 Blackbox Exporter — External Health Checks:** HTTP/HTTPS, TCP, DNS, ICMP (izin verilen ortamlarda) probe modülleri; TLS sertifika bitişi, yanıt süresi, DNS çözümleme ve erişilebilirlik; Prometheus multi-target scrape, Grafana service-health dashboard, Alertmanager alarmları. Ayrıntılar: `docs/design/BLACKBOX_EXPORTER_DESIGN.md`. SSRF ve iç ağ taraması riskine karşı sabit allowlist, özel ağ erişim kısıtları, kullanıcı girdisinden serbest URL almama, yetkili admin değişiklikleri ve audit zorunludur. SMS/SMTP gerçek teslimatını doğrulamaz; provider adapter başarısı ayrı metriklerden izlenir.
 - **10.9 Production readiness:** Fault/load/chaos tests, Collector down senaryosu, bounded buffers, sampling, retention, TLS/RBAC, SLO, dashboards, licensing/SBOM, SaaS/self-hosted deployment ve runbook.
 
 Kabul: Java ve .NET örnek akışlarından en az birinde metric/log/trace korelasyonu, Collector kesintisinde ana iş akışının sürmesi, gizli verinin export edilmemesi, alarm ve dashboard testleri, tenant izolasyonu, tek komutla opsiyonel observability profili.

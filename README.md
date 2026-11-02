@@ -3,7 +3,7 @@
 **Connect · Notify · Automate** — BuildingFlow, TraceFlow, AkaAI ve bağımsız Java/.NET uygulamaları için multi-tenant,
 SaaS veya self-hosted çalışan entegrasyon ve bildirim platformu.
 
-> Durum: **PHASE-01 (Foundation & Branding)**. Faz planı: [PHASES.md](PHASES.md) · Durum: [docs/PHASE_STATUS.md](docs/PHASE_STATUS.md)
+> Durum: **PHASE-01 (Foundation & Branding)**. Faz planı: [docs/phases/PHASES.md](docs/phases/PHASES.md) · Durum: [docs/phases/PHASE_STATUS.md](docs/phases/PHASE_STATUS.md)
 
 ## Hızlı başlangıç
 Gereksinimler: Docker, Python 3.13 + [uv](https://docs.astral.sh/uv/), Node 22+.
@@ -32,6 +32,7 @@ Portlar BuildingFlow/TraceFlow ile çakışmaması için 2xxxx bloğundadır; `.
 | `docs` | ADR, lisans envanteri, tehdit modeli, rehberler, marka kılavuzu |
 
 ## Dokümantasyon
+- Dokümantasyon dizini: [docs/README.md](docs/README.md)
 - Mimari kararlar: [docs/adr](docs/adr/README.md)
 - Başlangıç rehberi: [TR](docs/guides/tr/getting-started.md) · [EN](docs/guides/en/getting-started.md)
 - Marka kılavuzu: [docs/brand/BRAND_GUIDE.md](docs/brand/BRAND_GUIDE.md)

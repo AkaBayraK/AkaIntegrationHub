@@ -15,7 +15,7 @@
 5. **Marka:** özgün A-akış logo SVG (renkli, monochrome, dark, light), favicon, design tokens (CSS + JSON), marka kılavuzu.
 6. **CI:** GitHub Actions — Maven build + test (Testcontainers), web lint/typecheck/test/build, CycloneDX SBOM,
    Markdown link kontrolü.
-7. **Dokümantasyon:** README (TR), `docs/guides/{tr,en}/getting-started.md`, `docs/PHASE_STATUS.md`, CHANGELOG.
+7. **Dokümantasyon:** README (TR), `docs/guides/{tr,en}/getting-started.md`, `docs/phases/PHASE_STATUS.md`, CHANGELOG.
 
 ## Kabul kriterleri
 - `make up` (veya `docker compose -f infra/docker/compose.yaml up -d`) + `mvn -pl apps/api spring-boot:run` ile lokal start.

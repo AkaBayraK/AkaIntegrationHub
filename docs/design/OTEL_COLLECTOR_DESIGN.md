@@ -41,4 +41,4 @@ OpenTelemetry Collector Contrib ile Aka Integration Hub API/worker ve entegre Ja
 8. Yeni dependency lisansları ve NOTICE/SBOM gözden geçirilir.
 
 ## Codex/Claude uygulama kuralı
-Önce `MASTER_PROMPT.md`, `AGENTS.md`, `PHASES.md`, `OBSERVABILITY_DESIGN.md` ve bu dosyayı oku. Yalnızca PHASE-10.2 için mevcut repo analizi yap; önerilen değişiklikleri ve testleri Türkçe konsola yaz; mevcut dosyaları değiştirmeden onay bekle. Onay sonrası küçük, testli ve geri alınabilir adımlarla uygula.
+Önce `docs/process/MASTER_PROMPT.md`, `AGENTS.md`, `docs/phases/PHASES.md`, `docs/design/OBSERVABILITY_DESIGN.md` ve bu dosyayı oku. Yalnızca PHASE-10.2 için mevcut repo analizi yap; önerilen değişiklikleri ve testleri Türkçe konsola yaz; mevcut dosyaları değiştirmeden onay bekle. Onay sonrası küçük, testli ve geri alınabilir adımlarla uygula.

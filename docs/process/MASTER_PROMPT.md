@@ -34,7 +34,7 @@ Provider registry, provider capability discovery, tenant/proje credential konfig
 Analiz, ADR, veri modeli, API kontratı, migration, backend, frontend (gerekiyorsa), SDK (gerekiyorsa), unit/integration/e2e test, security tests, lisans tarama sonucu, changelog, demo ve kabul kriterleri. Belirsizlikleri sor; mevcut kodu varsayma.
 
 ## İlk çalıştırma komutu
-`AGENTS.md`, `PHASES.md` ve bu dosyayı oku. Repository'yi analiz et. SADECE PHASE-00 ve PHASE-01 için analiz/plan üret; henüz uygulama kodu yazma. Türkçe adım adım konsol raporu ver. Riskleri ve lisans kararlarını açıkla. Onayımı bekle.
+`AGENTS.md`, `docs/phases/PHASES.md` ve bu dosyayı oku. Repository'yi analiz et. SADECE PHASE-00 ve PHASE-01 için analiz/plan üret; henüz uygulama kodu yazma. Türkçe adım adım konsol raporu ver. Riskleri ve lisans kararlarını açıkla. Onayımı bekle.
 
 
 ## Cache, broker ve dokümantasyon için zorunlu ek gereksinimler
@@ -42,14 +42,14 @@ Analiz, ADR, veri modeli, API kontratı, migration, backend, frontend (gerekiyor
 - PostgreSQL otoritatif veri kaynağıdır. Kontör defteri, gönderim durumları, idempotency ve audit kayıtları yalnızca cache'te tutulamaz. RabbitMQ kalıcı mesaj işleme için tercih edilir; Valkey Pub/Sub kalıcı bildirim kuyruğu yerine kullanılmaz.
 - Tenant/project anahtar izolasyonu, TTL, invalidation, cache-down fallback, kilit/fencing ve gözlemlenebilirlik için test zorunlu.
 - Dokümantasyon birinci sınıf ürün bileşenidir: Docusaurus TR/EN, OpenAPI 3.1, Swagger UI, Storybook, Java/.NET/TypeScript SDK örnekleri, SaaS/self-hosted kurulum, SystemAdmin kılavuzu, ADR, C4/Mermaid ve operasyon runbook'ları. Her faz dokümantasyon ve changelog güncellemesiyle tamamlanır.
-- PHASES.md PHASE-15 ve PHASE-16'yı içerir; PHASE-01 temel iskeleti erkenden kurar.
+- `docs/phases/PHASES.md` PHASE-15 ve PHASE-16'yı içerir; PHASE-01 temel iskeleti erkenden kurar.
 
 ## PHASE-10 — Monitoring & Observability
-PHASE-10 için `OBSERVABILITY_DESIGN.md` zorunlu şartnamedir. Prometheus + Grafana + Alertmanager + OpenTelemetry/Tempo + Loki mimarisini uygula; KVKK/PII koruması, tenant izolasyonu, düşük kardinaliteli metrics, monitoring kapalıyken uygulamanın çalışması ve lisans kontrolü zorunludur.
+PHASE-10 için `docs/design/OBSERVABILITY_DESIGN.md` zorunlu şartnamedir. Prometheus + Grafana + Alertmanager + OpenTelemetry/Tempo + Loki mimarisini uygula; KVKK/PII koruması, tenant izolasyonu, düşük kardinaliteli metrics, monitoring kapalıyken uygulamanın çalışması ve lisans kontrolü zorunludur.
 
 
 ## V6 — SMTP yönetimi ve Mailpit
-`SMTP_ADMIN_UI_DESIGN.md` ve `SMTP_MAILPIT_DESIGN.md` dosyalarını incele. Gerçek SMTP tenant bazlı yönetilir; Mailpit yalnızca izole geliştirme/test profilinde çalışır. PHASE-03/04/08 fazlarını sırasıyla analiz et; mevcut kodu değiştirmeden önce onay al.
+`docs/design/SMTP_ADMIN_UI_DESIGN.md` ve `docs/design/SMTP_MAILPIT_DESIGN.md` dosyalarını incele. Gerçek SMTP tenant bazlı yönetilir; Mailpit yalnızca izole geliştirme/test profilinde çalışır. PHASE-03/04/08 fazlarını sırasıyla analiz et; mevcut kodu değiştirmeden önce onay al.
 
 ## v2 — Zorunlu uygulama kapısı
 Her geliştirme fazında `AGENTS.md` içindeki v2 kalite kurallarını uygula. Tek faz, hedefli keşif, lisans ve güvenlik kapısı, mevcut ortak kodun yeniden kullanımı, minimal diff, hedefli test ve kısa Türkçe ilerleme zorunludur. Mevcut iş kurallarını ve faz sıralamasını koru. Bu dosyaların varlığı, lisansların veya testlerin fiilen doğrulandığı anlamına gelmez.
