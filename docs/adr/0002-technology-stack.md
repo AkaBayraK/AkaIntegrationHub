@@ -2,6 +2,8 @@
 
 **Durum:** Önerildi · **Faz:** PHASE-00 · **Doğrulama tarihi:** 2026-10-15
 
+> Not: Backend dili ve framework satırlarının ADR-0013 (Python/FastAPI) ile değiştirilmesi önerildi.
+
 ## Karar
 Sürümler resmi kaynaklardan (Maven Central metadata, npm registry, Docker registry) okunmuştur. Otomatik "en yeni"
 yükseltme yapılmaz; yükseltmeler ayrı PR ve lisans kapısı ile yapılır.

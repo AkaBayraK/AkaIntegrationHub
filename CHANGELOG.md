@@ -1,6 +1,10 @@
 # Changelog
 
 ## [Unreleased]
+### Mimari karar önerileri (kod değişikliği yok)
+- ADR-0013: backend'in Python/FastAPI'ye taşınması önerisi; PHASE-01R planı (`docs/plans/PYTHON_MIGRATION_PLAN.md`).
+- ADR-0014: MCP tabanlı AI yapılandırma asistanı; PHASES.md'ye PHASE-01R ve PHASE-17 eklendi.
+
 ### PHASE-01 — Foundation & Branding
 - Maven reactor: `aih-common`, `aih-api`, `aih-worker` (Spring Boot 4.1.1, Java 21 bytecode).
 - API: liveness/readiness (PostgreSQL + Valkey + RabbitMQ), ayrı yönetim portu, `X-Correlation-Id`, RFC 9457 hata modeli, `GET /v1/system/info`, Flyway ilk migration.
