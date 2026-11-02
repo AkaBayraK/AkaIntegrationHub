@@ -101,13 +101,32 @@ describe('SmtpAccountsPage', () => {
     });
     render(<Host fetchMock={fetchMock}><SmtpAccountsPage /></Host>);
 
-    const row = await screen.findByRole('row', { name: /Kurumsal SMTP/ });
-    expect(within(row).getByText('Varsayılan')).toBeInTheDocument();
-    expect(within(row).getByText('smtp.example.com:587')).toBeInTheDocument();
-    expect(within(row).getByRole('button', { name: 'Bağlantı testi: Kurumsal SMTP' })).toBeInTheDocument();
-    expect(within(row).queryByRole('button', { name: /Varsayılan yap/ })).not.toBeInTheDocument();
+    const detail = await screen.findByRole('region', { name: 'Kurumsal SMTP' });
+    expect(within(detail).getByText('Varsayılan')).toBeInTheDocument();
+    expect(within(detail).getByText('smtp.example.com:587')).toBeInTheDocument();
+    expect(within(detail).getByRole('button', { name: 'Bağlantı testi: Kurumsal SMTP' })).toBeInTheDocument();
+    expect(within(detail).queryByRole('button', { name: /Varsayılan yap/ })).not.toBeInTheDocument();
+    const list = screen.getByRole('list', { name: 'Hesap listesi' });
+    expect(within(list).getByRole('button', { name: /Kurumsal SMTP/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('Aktif hesap').nextSibling).toHaveTextContent('1/1');
     const [, init] = fetchMock.mock.calls.find(([u]) => String(u).includes('/smtp-accounts'))!;
     expect((init!.headers as Record<string, string>).Authorization).toBe('Bearer token-123');
+  });
+
+  it('opens the account passed from the home page and returns home', async () => {
+    const second = { ...ACCOUNT, id: 'acc-2', name: 'Fatura SMTP', isDefault: false, lastTestOutcome: 'failed' as const };
+    const navigate = vi.fn();
+    const fetchMock = mockFetch((url) =>
+      url.pathname === '/v1/me' ? { body: me(ADMIN) } : { body: { items: [ACCOUNT, second], nextCursor: null } },
+    );
+    render(<Host fetchMock={fetchMock} navigate={navigate}><SmtpAccountsPage initialAccountId="acc-2" /></Host>);
+    const detail = await screen.findByRole('region', { name: 'Fatura SMTP' });
+    expect(within(detail).getAllByText('Test başarısız').length).toBeGreaterThan(0);
+    expect(screen.getByText('Dikkat gereken').nextSibling).toHaveTextContent('1');
+    fireEvent.click(screen.getByRole('button', { name: /Kurumsal SMTP/ }));
+    expect(screen.getByRole('region', { name: 'Kurumsal SMTP' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('link', { name: '← Entegrasyonlar' }));
+    expect(navigate).toHaveBeenCalledWith('/');
   });
 
   it('hides write actions for viewers', async () => {
@@ -115,8 +134,9 @@ describe('SmtpAccountsPage', () => {
       url.pathname === '/v1/me' ? { body: me(['smtp-account:read']) } : { body: { items: [ACCOUNT], nextCursor: null } },
     );
     render(<Host fetchMock={fetchMock}><SmtpAccountsPage /></Host>);
-    await screen.findByRole('row', { name: /Kurumsal SMTP/ });
-    expect(screen.queryByRole('button', { name: 'Yeni hesap' })).not.toBeInTheDocument();
+    await screen.findByRole('region', { name: 'Kurumsal SMTP' });
+    expect(screen.queryByRole('button', { name: '+ Yeni hesap' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Yeni SMTP hesabı/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Bağlantı testi/ })).not.toBeInTheDocument();
   });
 
