@@ -10,6 +10,8 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
 
+APP_ROLE = "aih_app"
+
 
 class Base(DeclarativeBase):
     pass
@@ -24,6 +26,9 @@ class Database:
         """Tek transaction; ``tenant_id`` verilirse RLS bağlamı transaction'a özel ayarlanır."""
         async with self.sessions() as session, session.begin():
             if tenant_id is not None:
+                # RLS: süper kullanıcı/sahip bağlantısında bile politikaların uygulanması için
+                # transaction'a özel, yetkisi kısıtlı rol.
+                await session.execute(text(f"SET LOCAL ROLE {APP_ROLE}"))
                 await session.execute(
                     text("SELECT set_config('app.tenant_id', :tenant, true)"), {"tenant": str(tenant_id)}
                 )

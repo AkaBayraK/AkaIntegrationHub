@@ -1,6 +1,16 @@
 # Changelog
 
 ## [Unreleased]
+### PHASE-03 dilimi — SMTP hesap tanımı ve bağlantı testi
+- `provider.smtp_accounts`, `provider.smtp_connection_tests`, şifreli `provider.secrets` (Fernet, anahtar rotasyonlu `AIH_SECRET_KEYS`).
+- PostgreSQL RLS (`FORCE`) + transaction'a özel `aih_app` rolü: tenant bağlamı olmadan satır görünmez.
+- `/v1/provider-types/smtp` (capability discovery) ve `/v1/tenants/{tenantId}/smtp-accounts` (liste/oluştur/oku/güncelle,
+  `secret` rotasyonu, `make-default`, `test-connection`, `connection-tests`); ETag/If-Match, cursor sayfalama.
+- Secret asla geri okunmaz; Viewer'da host/kullanıcı adı maskeli; tüm değişiklikler audit'e yazılır.
+- İş kuralları: production'da TLS zorunlu, Mailpit yalnız test, port/TLS uyumu, tek varsayılan hesap (DB unique index).
+- SSRF koruması: host biçimi, port izinleri, DNS sonrası tüm IP'lerin kontrolü, doğrulanan IP'ye bağlanma (rebinding koruması).
+- Adım bazlı bağlantı testi (DNS/TCP/TLS/greeting/AUTH); sağlayıcı ham yanıtı yerine sınıflandırılmış hata kodu.
+
 ### PHASE-02 dilimi — Tenant ve kimlik (SMTP için)
 - `tenancy.tenants`, `tenancy.identity_providers` (OIDC issuer → tenant eşlemesi), `audit.audit_events` (append-only trigger).
 - OIDC/JWT doğrulama: yalnız kayıtlı issuer'lar, JWKS kayıttan (token'dan değil), RS/ES/PS algoritmaları, `azp`/`aud` istemci kontrolü.

@@ -3,7 +3,7 @@ COMPOSE = docker compose --env-file .env -f infra/docker/compose.yaml
 .PHONY: env up up-mail down sync api worker test lint web
 
 env:
-	@test -f .env || cp .env.example .env
+	@test -f .env || (cp .env.example .env && sed -i.bak "s|^AIH_SECRET_KEYS=$$|AIH_SECRET_KEYS=local:$$(python3 -c 'import base64,os;print(base64.urlsafe_b64encode(os.urandom(32)).decode())')|" .env && rm -f .env.bak)
 
 up: env
 	$(COMPOSE) up -d --wait

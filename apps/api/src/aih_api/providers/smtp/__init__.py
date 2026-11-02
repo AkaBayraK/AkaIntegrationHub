@@ -1,0 +1,1 @@
+"""SMTP hesapları (SMTP_MAILPIT_DESIGN.md, SMTP_ADMIN_UI_DESIGN.md)."""
