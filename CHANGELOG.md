@@ -1,6 +1,13 @@
 # Changelog
 
 ## [Unreleased]
+### PHASE-02 dilimi — Tenant ve kimlik (SMTP için)
+- `tenancy.tenants`, `tenancy.identity_providers` (OIDC issuer → tenant eşlemesi), `audit.audit_events` (append-only trigger).
+- OIDC/JWT doğrulama: yalnız kayıtlı issuer'lar, JWKS kayıttan (token'dan değil), RS/ES/PS algoritmaları, `azp`/`aud` istemci kontrolü.
+- Tenant ve roller token claim'inden değil issuer kaydından türetilir; IdP rolleri → `PlatformAdmin`/`TenantAdmin`/`Viewer`.
+- `GET /v1/me`; tenant path kapsamı (`require(permission)`: yabancı tenant → 404, izin yok → 403).
+- `aih-api register-tenant` komutu; yalnız local/test için `X-AIH-Dev-User` geliştirici kimliği; CORS origin ayarı.
+
 ### PHASE-01R — Backend Python/FastAPI geçişi
 - `aih-api`, `aih-worker`, `aih-common` Python 3.13 / FastAPI ile yeniden yazıldı (uv workspace); Java/Maven kaynakları kaldırıldı.
 - Aynı davranış: `GET /v1/system/info`, `X-Correlation-Id`, RFC 9457 hata modeli (`AIH-COMMON-xxx`), ayrı yönetim portunda
