@@ -36,6 +36,9 @@
 | testcontainers-python | 4.15.0 | Apache-2.0 | test | Doğrulandı |
 | ruff / mypy / import-linter | 0.17.3 / 2.4.1 / 2.15 | MIT / MIT / BSD-2-Clause | build | Doğrulandı |
 | cyclonedx-bom (Python) | 7.6.0 | Apache-2.0 | build | Doğrulandı |
+| pip-audit | 2.10.1 | Apache-2.0 | build (dağıtılmaz) | Doğrulandı |
+| pytest-cov (coverage.py) | 7.1.0 | MIT (coverage.py: Apache-2.0) | test (dağıtılmaz) | Doğrulandı |
+| Trivy (CI action) | trivy-action 0.28.0 | Apache-2.0 | CI (dağıtılmaz) | Doğrulandı |
 | PyJWT[crypto] | 2.15.1 | MIT | runtime | Doğrulandı |
 | cryptography | 50.0.2 | Apache-2.0 OR BSD-3-Clause | runtime | Doğrulandı |
 | aiosmtplib | 5.1.3 | MIT | runtime | Doğrulandı |

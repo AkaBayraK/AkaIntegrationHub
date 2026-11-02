@@ -15,14 +15,26 @@ _EMAIL = re.compile(
 )
 
 
+MAX_EMAIL_LENGTH = 320
+
+
 def _email(value: str) -> str:
     value = value.strip()
-    if len(value) > 320 or not _EMAIL.match(value):
+    if len(value) > MAX_EMAIL_LENGTH or not _EMAIL.match(value):
         raise ValueError("geçerli bir e-posta adresi değil")
     return value
 
 
 EmailAddress = Annotated[str, AfterValidator(_email)]
+
+
+def _strip_single_line(value: str | None) -> str | None:
+    if value is None:
+        return None
+    stripped = value.strip()
+    if any(ch in stripped for ch in "\r\n\x00"):
+        raise ValueError("satır sonu veya kontrol karakteri içeremez")
+    return stripped
 
 
 class ApiModel(BaseModel):
@@ -60,15 +72,7 @@ class SmtpAccountBase(ApiModel):
     timeout_seconds: int = Field(default=15, ge=1, le=120)
     rate_limit_per_minute: int | None = Field(default=None, ge=1, le=100_000)
 
-    @field_validator("name", "host", "username", "sender_name")
-    @classmethod
-    def _strip(cls, value: str | None) -> str | None:
-        if value is None:
-            return None
-        stripped = value.strip()
-        if any(ch in stripped for ch in "\r\n\x00"):
-            raise ValueError("satır sonu veya kontrol karakteri içeremez")
-        return stripped
+    _strip = field_validator("name", "host", "username", "sender_name")(_strip_single_line)
 
 
 class SmtpAccountCreate(SmtpAccountBase):
@@ -94,7 +98,7 @@ class SmtpAccountUpdate(ApiModel):
     timeout_seconds: int | None = Field(default=None, ge=1, le=120)
     rate_limit_per_minute: int | None = Field(default=None, ge=1, le=100_000)
 
-    _strip = field_validator("name", "host", "username", "sender_name")(SmtpAccountBase._strip.__func__)  # type: ignore[attr-defined]
+    _strip = field_validator("name", "host", "username", "sender_name")(_strip_single_line)
 
 
 class SecretRotate(ApiModel):

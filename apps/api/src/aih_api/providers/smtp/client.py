@@ -15,7 +15,7 @@ from typing import Any
 import aiosmtplib
 
 from aih_api.providers.smtp.capabilities import AuthMode, TlsMode
-from aih_api.providers.smtp.network import NetworkPolicy, TargetNotAllowed, open_socket
+from aih_api.providers.smtp.network import NetworkPolicy, TargetNotAllowedError, open_socket
 from aih_api.secrets import SecretValue
 
 
@@ -71,21 +71,28 @@ class SmtpError(Exception):
         self.code = code
 
 
+_SMTP_REPLY_ERROR_MIN = 400
+_SMTP_REPLY_ERROR_MAX = 600
+
+# Sıra önemlidir: alt sınıflar (ör. SMTPAuthenticationError) üst sınıflarından önce eşleşmelidir.
+_ERROR_CODES: tuple[tuple[type[BaseException] | tuple[type[BaseException], ...], str], ...] = (
+    (aiosmtplib.SMTPAuthenticationError, "SMTP_AUTH_FAILED"),
+    ((aiosmtplib.SMTPTimeoutError, TimeoutError), "SMTP_TIMEOUT"),
+    ((ssl.SSLError, aiosmtplib.SMTPConnectTimeoutError), "SMTP_TLS_FAILED"),
+    ((aiosmtplib.SMTPRecipientsRefused, aiosmtplib.SMTPRecipientRefused), "SMTP_RECIPIENT_REFUSED"),
+    (aiosmtplib.SMTPSenderRefused, "SMTP_SENDER_REFUSED"),
+)
+
+
 def classify(exc: BaseException) -> str:
-    if isinstance(exc, TargetNotAllowed):
+    if isinstance(exc, TargetNotAllowedError):
         return exc.code
-    if isinstance(exc, aiosmtplib.SMTPAuthenticationError):
-        return "SMTP_AUTH_FAILED"
-    if isinstance(exc, aiosmtplib.SMTPTimeoutError | TimeoutError):
-        return "SMTP_TIMEOUT"
-    if isinstance(exc, ssl.SSLError | aiosmtplib.SMTPConnectTimeoutError):
-        return "SMTP_TLS_FAILED"
-    if isinstance(exc, aiosmtplib.SMTPRecipientsRefused | aiosmtplib.SMTPRecipientRefused):
-        return "SMTP_RECIPIENT_REFUSED"
-    if isinstance(exc, aiosmtplib.SMTPSenderRefused):
-        return "SMTP_SENDER_REFUSED"
+    for types, code in _ERROR_CODES:
+        if isinstance(exc, types):
+            return code
     if isinstance(exc, aiosmtplib.SMTPResponseException):
-        return f"SMTP_{exc.code}" if 400 <= exc.code < 600 else "SMTP_PROTOCOL_ERROR"
+        is_reply_error = _SMTP_REPLY_ERROR_MIN <= exc.code < _SMTP_REPLY_ERROR_MAX
+        return f"SMTP_{exc.code}" if is_reply_error else "SMTP_PROTOCOL_ERROR"
     if isinstance(exc, ConnectionError | OSError | aiosmtplib.SMTPConnectError):
         return "SMTP_CONNECT_FAILED"
     return "SMTP_PROTOCOL_ERROR"
@@ -134,5 +141,5 @@ async def smtp_session(
     finally:
         try:
             await client.quit()
-        except Exception:
+        except (aiosmtplib.SMTPException, OSError, TimeoutError):
             client.close()

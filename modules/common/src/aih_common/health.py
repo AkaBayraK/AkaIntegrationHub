@@ -23,7 +23,7 @@ async def run_checks(checks: Mapping[str, Check]) -> bool:
     async def one(name: str, check: Check) -> bool:
         try:
             return await asyncio.wait_for(check(), CHECK_TIMEOUT_SECONDS)
-        except Exception as exc:  # her türlü bağımlılık hatası DOWN demektir
+        except Exception as exc:  # noqa: BLE001 - her türlü bağımlılık hatası DOWN demektir
             _log.warning("readiness_check_failed", check=name, error=type(exc).__name__)
             return False
 

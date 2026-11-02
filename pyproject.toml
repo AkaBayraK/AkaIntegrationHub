@@ -15,6 +15,8 @@ dev = [
     "mypy==2.4.1",
     "import-linter==2.15",
     "cyclonedx-bom==7.6.0",
+    "pip-audit==2.10.1",
+    "pytest-cov==7.1.0",
 ]
 
 [tool.uv]
@@ -42,16 +44,50 @@ line-length = 120
 target-version = "py313"
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "B", "UP", "S", "ASYNC", "RUF"]
-ignore = ["S101", "RUF001", "RUF002", "RUF003"]
+# Kural setinin gerekçesi: docs/standards/PYTHON_CODING_STANDARDS.md
+select = [
+    "E", "W", "F", "I", "N", "UP", "B", "A", "C4", "C90", "DTZ", "T20", "PIE", "PT", "RET", "SIM", "TID", "ARG",
+    "PTH", "ERA", "PL", "TRY", "FBT", "SLF", "ISC", "PERF", "FURB", "LOG", "G", "BLE", "S", "ASYNC", "RUF",
+]
+ignore = [
+    "RUF001", "RUF002", "RUF003",  # Türkçe metinlerdeki karakterler bilinçli
+    "PLR0913",                     # keyword-only parametreler serbest; positional sınır PLR0917 ile korunur
+    "TRY003",                      # alan kodlu DomainError mesajları çağrı yerinde verilir
+    "TRY301",
+    "FBT003",                      # stdlib/üçüncü taraf API'lerine positional bool geçişi
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-positional-args = 5
+max-returns = 6
+max-branches = 12
+max-statements = 50
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
 
 [tool.ruff.lint.isort]
 known-first-party = ["aih_common", "aih_api", "aih_worker"]
 
 [tool.ruff.lint.per-file-ignores]
-"**/tests/**" = ["S104", "S105", "S106"]
-"conftest.py" = ["S105", "S106"]
-"apps/api/migrations/**" = ["E501"]
+"**/tests/**" = ["S101", "S104", "S105", "S106", "PLR2004", "ARG", "PLC0415", "SLF001", "FBT"]
+"conftest.py" = ["S101", "S105", "S106", "PLC0415"]
+"apps/api/migrations/**" = ["E501", "ERA001"]
+"**/routes.py" = ["PLR0917", "FBT001"]  # FastAPI bağımlılık/sorgu parametreleri handler imzasında tanımlanır
+"**/cli.py" = ["T201"]
+
+[tool.coverage.run]
+branch = true
+source = ["aih_common", "aih_api", "aih_worker"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_also = ["if TYPE_CHECKING:", "raise NotImplementedError", "@overload"]
+fail_under = 85
 
 [tool.mypy]
 strict = true

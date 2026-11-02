@@ -4,6 +4,7 @@
 - SOLID, DRY, KISS, YAGNI: iş kuralını tek kaynakta tut; sırf DRY adına ilgisiz domainleri birleştirme; gereksiz abstraction/utility yazma.
 - Java: nullability, transaction sınırı, checked/unchecked hata modeli, JPA N+1, lazy loading ve thread safety'yi kontrol et.
 - .NET: async/await, CancellationToken, DI scope, EF Core tracking, concurrency ve transaction sınırlarını kontrol et.
+- Python: `docs/standards/PYTHON_CODING_STANDARDS.md` (ruff, mypy --strict, kapsam ≥ %85, pip-audit, Trivy).
 - TypeScript: strict tipler, `any` kaçınma, tek API sözleşmesi, server/client ayrımı, erişilebilir ve yeniden kullanılabilir UI.
 - API: doğrulama, tutarlı hata modeli, yetkilendirme, pagination, idempotency (gereken yerde), geriye uyumluluk.
 - DB: migration, indeks gerekçesi, tenant scope, optimistic concurrency ve veri kaybı önlemi.

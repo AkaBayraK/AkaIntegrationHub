@@ -41,7 +41,11 @@ class ApiErrorCode(Enum):
         for candidate in cls:
             if candidate.status == status:
                 return candidate
-        return cls.BAD_REQUEST if 400 <= status < 500 else cls.INTERNAL_ERROR
+        return (
+            cls.BAD_REQUEST
+            if HTTPStatus.BAD_REQUEST <= status < HTTPStatus.INTERNAL_SERVER_ERROR
+            else cls.INTERNAL_ERROR
+        )
 
 
 def problem_response(

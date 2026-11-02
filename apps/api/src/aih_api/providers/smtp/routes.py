@@ -42,6 +42,9 @@ async def smtp_context(request: Request, scope: TenantScope) -> AsyncIterator[se
         )
 
 
+_MIN_MASKED_HOST_LABELS = 2
+
+
 def _mask(value: str | None) -> str | None:
     if not value:
         return value
@@ -49,7 +52,7 @@ def _mask(value: str | None) -> str | None:
     if at:
         return (head[:1] + "***@" + domain) if head else value
     parts = value.split(".")
-    return ".".join(["***", *parts[-2:]]) if len(parts) > 2 else value[:1] + "***"
+    return ".".join(["***", *parts[-2:]]) if len(parts) > _MIN_MASKED_HOST_LABELS else value[:1] + "***"
 
 
 def _out(account: SmtpAccount, scope: TenantScope) -> SmtpAccountOut:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import uuid
 from typing import Any
 
@@ -23,8 +24,6 @@ async def record(
     details: dict[str, Any] | None = None,
 ) -> None:
     """Audit kaydı yazar. ``details`` sır içermemelidir; yine de anahtar adına göre maskelenir."""
-    import json
-
     safe = dict(redact_sensitive(None, "audit", dict(details or {})))
     if principal.is_platform_admin and tenant_id is not None and tenant_id != principal.tenant_id:
         safe["breakGlass"] = True

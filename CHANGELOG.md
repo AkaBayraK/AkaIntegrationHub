@@ -1,6 +1,13 @@
 # Changelog
 
 ## [Unreleased]
+### Kalite — Python kodlama standartları
+- `docs/standards/PYTHON_CODING_STANDARDS.md`: stil, tasarım, tip, hata/log, Fortify/OWASP eşlemesi, test ve PR kalite kapısı (≥ 8,5).
+- ruff kural seti genişletildi (karmaşıklık ≤ 10, positional parametre ≤ 5, sihirli sayı, kör `except`, `assert` yasağı);
+  mevcut kod uyumlu hale getirildi (`TargetNotAllowed` → `TargetNotAllowedError`, SMTP doğrulama kuralları bölündü).
+- `make check`; CI'da dal kapsamı ≥ %85, pip-audit ve Trivy (vuln/secret/misconfig) adımları; PR şablonu.
+- Dokümanlar kök dizinden `docs/` altına taşındı (`docs/README.md`).
+
 ### PHASE-13 dilimi — BuildingFlow ve TraceFlow menü entegrasyonu
 - BuildingFlow "Yönetim > Entegrasyonlar" ve TraceFlow "Ayarlar > Entegrasyonlar" menüleri Hub SMTP ekranlarını açar
   (AkaBayraK/BuildingFlow#118, AkaBayraK/TraceFlow#8). Ortak Keycloak SSO, her realm'de `aih-admin-web` public PKCE client'ı.

@@ -20,3 +20,7 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 python-bom.json
+.audit-requirements.txt
+audit-requirements.txt
+coverage.xml
+.coverage

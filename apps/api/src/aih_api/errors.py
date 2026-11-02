@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from http import HTTPStatus
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -29,7 +31,9 @@ def install_error_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(StarletteHTTPException)
     async def http_error(request: Request, exc: StarletteHTTPException) -> Response:
-        detail = exc.detail if isinstance(exc.detail, str) and exc.status_code < 500 else None
+        detail = (
+            exc.detail if isinstance(exc.detail, str) and exc.status_code < HTTPStatus.INTERNAL_SERVER_ERROR else None
+        )
         return problem_response(exc.status_code, detail, instance=request.url.path, headers=exc.headers)
 
     @app.exception_handler(RequestValidationError)

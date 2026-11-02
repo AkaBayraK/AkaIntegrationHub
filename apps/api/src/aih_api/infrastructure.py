@@ -42,8 +42,7 @@ class Infrastructure:
     async def connect_rabbit(self, settings: ApiSettings) -> None:
         try:
             self.rabbit = await aio_pika.connect_robust(settings.rabbitmq.url(), timeout=5)
-        except Exception as exc:
-            # Readiness DOWN olur; robust bağlantı sonraki denemede yeniden kurulur.
+        except Exception as exc:  # noqa: BLE001 - readiness DOWN olur; robust bağlantı sonraki denemede yeniden kurulur
             _log.warning("rabbitmq_connect_failed", error=type(exc).__name__)
 
     async def close(self) -> None:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Literal
+from urllib.parse import quote
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -19,8 +20,6 @@ class RabbitSettings(BaseSettings):
     vhost: str = "aih"
 
     def url(self) -> str:
-        from urllib.parse import quote
-
         return (
             f"amqp://{quote(self.user, safe='')}:{quote(self.password, safe='')}"
             f"@{self.host}:{self.port}/{quote(self.vhost, safe='')}"

@@ -37,7 +37,7 @@ PHASE-10 çalışmasında `docs/design/OBSERVABILITY_DESIGN.md` dosyasını oku.
 PHASE-10.2 sırasında `docs/design/OTEL_COLLECTOR_DESIGN.md` belgesini oku; receiver/processor/exporter sinyal ayrımını doğrula. Var olan compose, environment ve auth ayarlarını ezme.
 
 ## Öncelikli kalite ve token protokolü (v2 ek)
-- Önce `docs/standards/TOKEN_OPTIMIZATION.md`, `docs/process/PHASE_EXECUTION_PROTOCOL.md` içindeki kısa yürütme kurallarını uygula; ilgili riskte `docs/licenses/LICENSE_POLICY.md`, `docs/standards/SECURITY_STANDARDS.md`, `docs/standards/CODING_STANDARDS.md`, `docs/standards/PERFORMANCE_RULES.md` başlıklarına başvur.
+- Önce `docs/standards/TOKEN_OPTIMIZATION.md`, `docs/process/PHASE_EXECUTION_PROTOCOL.md` içindeki kısa yürütme kurallarını uygula; ilgili riskte `docs/licenses/LICENSE_POLICY.md`, `docs/standards/SECURITY_STANDARDS.md`, `docs/standards/CODING_STANDARDS.md`, `docs/standards/PERFORMANCE_RULES.md` başlıklarına başvur. Python kodunda `docs/standards/PYTHON_CODING_STANDARDS.md` zorunludur; teslimden önce `make check` yeşil olmalı.
 - Fazların iş mantığını, mevcut kodu ve mevcut dosyaları koru; eski kurallarla çelişirse daha güvenli, dar kapsamlı ve açık onay gerektiren kural geçerlidir.
 - `docs/process/MASTER_PROMPT.md` ve `docs/phases/PHASES.md` dosyalarını her alt adımda yeniden okumak zorunda değilsin; yalnız ilgili bölümü oku.
 - Yeni dependency eklemeden lisans kontrolü ve eşdeğer mevcut çözüm araştırması yap.

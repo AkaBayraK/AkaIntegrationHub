@@ -24,7 +24,7 @@ from aih_api.providers.smtp.capabilities import (
 )
 from aih_api.providers.smtp.client import SmtpError, SmtpTarget, StepRecorder, smtp_session
 from aih_api.providers.smtp.models import SmtpAccount, SmtpConnectionTest
-from aih_api.providers.smtp.network import NetworkPolicy, TargetNotAllowed
+from aih_api.providers.smtp.network import NetworkPolicy, TargetNotAllowedError
 from aih_api.providers.smtp.schemas import SmtpAccountCreate, SmtpAccountUpdate
 from aih_api.secrets import SecretStore, SecretValue
 
@@ -44,7 +44,20 @@ class SmtpContext:
     platform_environment: str
 
 
+SUBMISSION_PORT = 587
+SMTPS_PORT = 465
+
+
 def _validate_rules(ctx: SmtpContext, account: SmtpAccount, *, has_password: bool) -> None:
+    _validate_capability(ctx, account)
+    _validate_transport_security(ctx, account, has_password=has_password)
+    try:
+        ctx.policy.check_static(account.host, account.port)
+    except TargetNotAllowedError as exc:
+        raise DomainError(422, "AIH-SMTP-011", str(exc), "host") from exc
+
+
+def _validate_capability(ctx: SmtpContext, account: SmtpAccount) -> None:
     capability = CAPABILITIES[ProviderType(account.provider_type)]
     tls = TlsMode(account.tls_mode)
     auth = AuthMode(account.auth_mode)
@@ -67,6 +80,13 @@ def _validate_rules(ctx: SmtpContext, account: SmtpAccount, *, has_password: boo
         raise DomainError(
             422, "AIH-SMTP-005", f"{capability.label} için kimlik doğrulama yöntemi desteklenmiyor", "authMode"
         )
+
+
+def _validate_transport_security(ctx: SmtpContext, account: SmtpAccount, *, has_password: bool) -> None:
+    tls = TlsMode(account.tls_mode)
+    auth = AuthMode(account.auth_mode)
+    env = AccountEnvironment(account.environment)
+
     if tls is TlsMode.NONE and (env is AccountEnvironment.PRODUCTION or ctx.platform_environment == "prod"):
         raise DomainError(422, "AIH-SMTP-006", "Production'da TLS zorunludur", "tlsMode")
     if (
@@ -80,14 +100,10 @@ def _validate_rules(ctx: SmtpContext, account: SmtpAccount, *, has_password: boo
             raise DomainError(422, "AIH-SMTP-008", "SMTP AUTH için kullanıcı adı gerekir", "username")
         if not has_password:
             raise DomainError(422, "AIH-SMTP-009", "SMTP AUTH için şifre gerekir", "password")
-    if tls is TlsMode.IMPLICIT and account.port == 587:
+    if tls is TlsMode.IMPLICIT and account.port == SUBMISSION_PORT:
         raise DomainError(422, "AIH-SMTP-010", "587 portu STARTTLS ile kullanılır; implicit TLS için 465", "port")
-    if tls is TlsMode.STARTTLS and account.port == 465:
+    if tls is TlsMode.STARTTLS and account.port == SMTPS_PORT:
         raise DomainError(422, "AIH-SMTP-010", "465 portu implicit TLS ile kullanılır; STARTTLS için 587", "port")
-    try:
-        ctx.policy.check_static(account.host, account.port)
-    except TargetNotAllowed as exc:
-        raise DomainError(422, "AIH-SMTP-011", str(exc), "host") from exc
 
 
 async def _name_taken(ctx: SmtpContext, name: str, exclude: uuid.UUID | None = None) -> bool:
@@ -205,11 +221,11 @@ def _decode_cursor(cursor: str | None) -> int:
         raw = base64.urlsafe_b64decode(cursor + "=" * (-len(cursor) % 4)).decode()
         kind, _, value = raw.partition(":")
         offset = int(value)
-        if kind != "o" or offset < 0:
-            raise ValueError
-        return offset
     except ValueError as exc:
         raise DomainError(400, "AIH-COMMON-400", "Geçersiz cursor", "cursor") from exc
+    if kind != "o" or offset < 0:
+        raise DomainError(400, "AIH-COMMON-400", "Geçersiz cursor", "cursor")
+    return offset
 
 
 def _check_version(account: SmtpAccount, expected: int) -> None:

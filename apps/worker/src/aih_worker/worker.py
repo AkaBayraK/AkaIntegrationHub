@@ -25,7 +25,7 @@ class Worker:
             try:
                 self.connection = await aio_pika.connect_robust(self.settings.rabbitmq.url(), timeout=5)
                 _log.info("rabbitmq_connected")
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001 - bağlantı hatası türünden bağımsız yeniden denenir
                 _log.warning("rabbitmq_connect_failed", error=type(exc).__name__)
                 await asyncio.sleep(2)
 
