@@ -36,6 +36,10 @@
 | testcontainers-python | 4.15.0 | Apache-2.0 | test | Doğrulandı |
 | ruff / mypy / import-linter | 0.17.3 / 2.4.1 / 2.15 | MIT / MIT / BSD-2-Clause | build | Doğrulandı |
 | cyclonedx-bom (Python) | 7.6.0 | Apache-2.0 | build | Doğrulandı |
+| PyJWT[crypto] | 2.15.1 | MIT | runtime | Doğrulandı |
+| cryptography | 50.0.2 | Apache-2.0 OR BSD-3-Clause | runtime | Doğrulandı |
+| aiosmtplib | 5.1.3 | MIT | runtime | Doğrulandı |
+| keycloak-js | 26.2.4 | Apache-2.0 | runtime (admin-web, OIDC) | Doğrulandı (npm, 2026-11-02) |
 | Next.js | 16.4.1 | MIT | runtime (web) | Doğrulandı |
 | React | 19.x | MIT | runtime (web) | Doğrulandı |
 | Tailwind CSS | 4.x | MIT | build | Eklenmedi (PHASE-08) |

@@ -1,6 +1,14 @@
 # Changelog
 
 ## [Unreleased]
+### PHASE-08 dilimi — SMTP yönetim ekranları
+- `@aka/integration-ui`: tipli `HubClient` (problem+json → `HubApiError`, ETag/If-Match, Idempotency-Key), `HubSessionProvider`.
+- Ekranlar: SMTP hesap listesi, oluştur/düzenle formu (istemci tarafı doğrulama), bağlantı testi sonucu (adım adım),
+  test e-postası paneli (onay + idempotency), gönderim geçmişi. TR/EN metinler, rol bazlı buton görünürlüğü.
+- `admin-web`: `/admin/email/providers`, `/admin/email/deliveries`; yerelde geliştirici kimliği, aksi halde Keycloak SSO
+  (`keycloak-js`, PKCE). Host uygulamadan gelen `idp`, `return`, `locale`, `theme`, `host` parametreleri (return origin allowlist'li).
+- API: dev modda CORS `X-AIH-Dev-User` başlığına izin verir.
+
 ### PHASE-04 dilimi — SMTP test e-postası ve Mailpit
 - `POST /v1/tenants/{tenantId}/smtp-accounts/{accountId}/send-test-email`: `confirm: true` ve `Idempotency-Key` zorunlu;
   aynı anahtar + aynı istek → aynı kayıt (ikinci gönderim yok), farklı istek → 409.

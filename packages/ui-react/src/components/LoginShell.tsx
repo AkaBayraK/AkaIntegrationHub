@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react';
 import { useAkaIntegration, useTranslation } from '../context';
 import { LogoMark } from './LogoMark';
 
-export function LoginShell() {
+/** ``children`` verilirse varsayılan giriş düğmesinin yerine gösterilir (ör. kimlik sağlayıcı seçimi). */
+export function LoginShell({ children, notice }: { children?: ReactNode; notice?: ReactNode } = {}) {
   const { auth } = useAkaIntegration();
   const t = useTranslation();
 
@@ -11,11 +13,13 @@ export function LoginShell() {
         <LogoMark size={56} />
         <h1 id="aih-login-title">{t('login.title')}</h1>
         <p className="aih-muted">{t('login.description')}</p>
-        <button type="button" className="aih-button aih-button--primary" onClick={auth.signIn}>
-          {t('login.submit')}
-        </button>
+        {children ?? (
+          <button type="button" className="aih-button aih-button--primary" onClick={auth.signIn}>
+            {t('login.submit')}
+          </button>
+        )}
         <p className="aih-notice" role="note">
-          {t('login.devNotice')}
+          {notice ?? t('login.devNotice')}
         </p>
       </section>
     </main>
