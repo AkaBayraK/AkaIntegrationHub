@@ -20,6 +20,12 @@ class Permission(StrEnum):
     CACHE_ACCOUNT_READ = "cache-account:read"
     CACHE_ACCOUNT_WRITE = "cache-account:write"
     CACHE_ACCOUNT_TEST = "cache-account:test"
+    SMS_ACCOUNT_READ = "sms-account:read"
+    SMS_ACCOUNT_WRITE = "sms-account:write"
+    SMS_ACCOUNT_TEST = "sms-account:test"
+    SMS_CREDIT_MANAGE = "sms-credit:manage"
+    SMS_SEND = "sms:send"
+    SMS_MESSAGE_READ = "sms-message:read"
 
 
 # Rol → izin eşlemesi kodda sabittir (ADR-0006). Listede olmayan her şey reddedilir.
@@ -27,7 +33,13 @@ ROLE_PERMISSIONS: dict[Role, frozenset[Permission]] = {
     Role.PLATFORM_ADMIN: frozenset(Permission),
     Role.TENANT_ADMIN: frozenset(Permission),
     Role.VIEWER: frozenset(
-        {Permission.SMTP_ACCOUNT_READ, Permission.EMAIL_DELIVERY_READ, Permission.CACHE_ACCOUNT_READ}
+        {
+            Permission.SMTP_ACCOUNT_READ,
+            Permission.EMAIL_DELIVERY_READ,
+            Permission.CACHE_ACCOUNT_READ,
+            Permission.SMS_ACCOUNT_READ,
+            Permission.SMS_MESSAGE_READ,
+        }
     ),
 }
 

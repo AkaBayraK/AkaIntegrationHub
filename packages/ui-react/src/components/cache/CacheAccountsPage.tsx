@@ -114,8 +114,8 @@ export function CacheAccountsPage({ homePath = '/' }: { homePath?: string }) {
             void load();
           }}
         />
-      ) : accounts === null && error === null ? (
-        <p role="status">{t('common.loading')}</p>
+      ) : accounts === null ? (
+        error === null && <p role="status">{t('common.loading')}</p>
       ) : !selected ? (
         <p className="aih-card aih-muted">{t('cache.empty')}</p>
       ) : (

@@ -158,6 +158,83 @@ export interface CacheConnectionTest {
   server: CacheServerInfo | null;
 }
 
+export type SmsProviderType = 'mock_test' | 'netgsm' | 'iletimerkezi' | 'verimor' | 'turkcell';
+export type SmsPurpose = 'otp' | 'security' | 'transactional' | 'operational' | 'marketing';
+export type SmsMessageStatus = 'queued' | 'sent' | 'failed' | 'unknown';
+
+export interface SmsCapability {
+  type: SmsProviderType;
+  label: string;
+  available: boolean;
+  requiresCredentials: boolean;
+  environments: AccountEnvironment[];
+  notes: string;
+}
+
+export interface SmsAccountInput {
+  name: string;
+  senderHeader: string;
+  username: string | null;
+  environment: AccountEnvironment;
+  enabled: boolean;
+  lowCreditThreshold: number;
+  consoleUrl: string | null;
+}
+
+export interface SmsAccountCreate extends SmsAccountInput {
+  providerType: SmsProviderType;
+  password?: string | null;
+  makeDefault?: boolean;
+}
+
+export interface SmsAccount extends SmsAccountInput {
+  id: string;
+  tenantId: string;
+  projectId: string | null;
+  providerType: SmsProviderType;
+  hasSecret: boolean;
+  isDefault: boolean;
+  creditBalance: number;
+  lowCredit: boolean;
+  lastTestAt: string | null;
+  lastTestOutcome: 'passed' | 'failed' | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SmsCreditTransaction {
+  id: string;
+  kind: 'load' | 'consume' | 'refund' | 'adjust';
+  quantity: number;
+  balanceAfter: number;
+  reason: string | null;
+  messageId: string | null;
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface SmsMessage {
+  id: string;
+  accountId: string;
+  kind: string;
+  purpose: SmsPurpose;
+  typeCode: string | null;
+  referenceType: string | null;
+  referenceId: string | null;
+  phoneMasked: string;
+  segments: number;
+  creditCost: number;
+  status: SmsMessageStatus;
+  providerType: SmsProviderType;
+  providerMessageId: string | null;
+  errorCode: string | null;
+  correlationId: string | null;
+  durationMs: number | null;
+  createdBy: string;
+  createdAt: string;
+}
+
 export interface Page<T> {
   items: T[];
   nextCursor: string | null;

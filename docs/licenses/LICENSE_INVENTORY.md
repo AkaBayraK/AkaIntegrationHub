@@ -32,7 +32,7 @@
 | aio-pika | 10.2.2 | Apache-2.0 | runtime | Doğrulandı |
 | structlog | 26.1.0 | MIT OR Apache-2.0 | runtime | Doğrulandı |
 | pytest / pytest-asyncio | 9.2.0 / 1.4.1.post1 | MIT / Apache-2.0 | test (dağıtılmaz) | Doğrulandı |
-| httpx | 0.28.1 | BSD-3-Clause | test | Doğrulandı |
+| httpx | 0.28.1 | BSD-3-Clause | runtime (SMS sağlayıcı istemcisi) + test | Doğrulandı |
 | testcontainers-python | 4.15.0 | Apache-2.0 | test | Doğrulandı |
 | ruff / mypy / import-linter | 0.17.3 / 2.4.1 / 2.15 | MIT / MIT / BSD-2-Clause | build | Doğrulandı |
 | cyclonedx-bom (Python) | 7.6.0 | Apache-2.0 | build | Doğrulandı |

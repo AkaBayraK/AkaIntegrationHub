@@ -42,6 +42,9 @@ class ApiSettings(BaseSettings):
     cache_allowed_ports: str = "6379,6380"
     cache_host_allowlist: str = ""
 
+    # Gerçek SMS sağlayıcısıyla test SMS'i yalnız bu numaralara gider (virgülle). Test sağlayıcısı herkese "gönderir".
+    sms_test_recipient_allowlist: str = ""
+
     valkey_host: str = "localhost"
     valkey_port: int = 26379
     valkey_password: str = ""

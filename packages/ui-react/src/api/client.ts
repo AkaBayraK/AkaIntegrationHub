@@ -1,4 +1,10 @@
 import type {
+  SmsAccount,
+  SmsAccountCreate,
+  SmsAccountInput,
+  SmsCapability,
+  SmsCreditTransaction,
+  SmsMessage,
   CacheAccount,
   CacheAccountCreate,
   CacheAccountInput,
@@ -92,6 +98,7 @@ export function createHubClient(options: HubClientOptions) {
     `${tenantPath(tenantId)}/smtp-accounts/${encodeURIComponent(id)}`;
   const cachePath = (tenantId: string, id: string) =>
     `${tenantPath(tenantId)}/cache-accounts/${encodeURIComponent(id)}`;
+  const smsPath = (tenantId: string, id: string) => `${tenantPath(tenantId)}/sms-accounts/${encodeURIComponent(id)}`;
   const ifMatch = (version: number) => ({ 'If-Match': `W/"${version}"` });
 
   return {
@@ -144,6 +151,33 @@ export function createHubClient(options: HubClientOptions) {
     makeDefaultCacheAccount: async (tenantId: string, id: string, version: number) =>
       (await request<CacheAccount>('POST', `${cachePath(tenantId, id)}/make-default`, { headers: ifMatch(version) }))
         .data,
+    smsCapabilities: async () => (await request<SmsCapability[]>('GET', '/v1/provider-types/sms')).data,
+    listSmsAccounts: async (tenantId: string, query: { q?: string; limit?: number } = {}) =>
+      (await request<Page<SmsAccount>>('GET', `${tenantPath(tenantId)}/sms-accounts`, { query })).data,
+    createSmsAccount: async (tenantId: string, body: SmsAccountCreate) =>
+      (await request<SmsAccount>('POST', `${tenantPath(tenantId)}/sms-accounts`, { body })).data,
+    updateSmsAccount: async (
+      tenantId: string,
+      id: string,
+      version: number,
+      body: Partial<SmsAccountInput> & { password?: string },
+    ) => (await request<SmsAccount>('PATCH', smsPath(tenantId, id), { body, headers: ifMatch(version) })).data,
+    makeDefaultSmsAccount: async (tenantId: string, id: string, version: number) =>
+      (await request<SmsAccount>('POST', `${smsPath(tenantId, id)}/make-default`, { headers: ifMatch(version) })).data,
+    loadSmsCredit: async (tenantId: string, id: string, quantity: number, reason?: string) =>
+      (await request<SmsAccount>('POST', `${smsPath(tenantId, id)}/credits`, { body: { kind: 'load', quantity, reason } }))
+        .data,
+    smsCreditHistory: async (tenantId: string, id: string) =>
+      (await request<SmsCreditTransaction[]>('GET', `${smsPath(tenantId, id)}/credits`)).data,
+    sendTestSms: async (tenantId: string, id: string, phone: string, idempotencyKey = newIdempotencyKey()) =>
+      (
+        await request<SmsMessage>('POST', `${smsPath(tenantId, id)}/send-test`, {
+          body: { phone, confirm: true },
+          headers: { 'Idempotency-Key': idempotencyKey },
+        })
+      ).data,
+    listSmsMessages: async (tenantId: string, query: { accountId?: string; status?: string; limit?: number } = {}) =>
+      (await request<Page<SmsMessage>>('GET', `${tenantPath(tenantId)}/sms/messages`, { query })).data,
     testCacheConnection: async (tenantId: string, id: string) =>
       (await request<CacheConnectionTest>('POST', `${cachePath(tenantId, id)}/test-connection`)).data,
   };

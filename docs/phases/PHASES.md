@@ -18,7 +18,7 @@ PlatformAdmin, TenantAdmin, ProjectAdmin, Operator, Viewer, ServiceAccount; tena
 Provider türleri/capabilities, credentials secret refs, account configuration, adapter SPI, connection tests, enable/disable, priorities, health, sandbox. SMTP tenant/proje bazlı hesaplar, gerçek provider credential secret refs, bağlantı testi, varsayılan/yedek hesap ve OAuth2/SMTP AUTH yetenekleri `docs/design/SMTP_MAILPIT_DESIGN.md` kapsamında. Kabul: mock provider ekleme ve yeni hesap UI/API üzerinden tanımlama.
 
 ## PHASE-04 — SMS & Email Channels
-SMS send/status/callback, SMTP TLS/auth, e-posta API adapter, sender identity, attachments policy, DKIM/SPF/DMARC kurulum rehberi, provider-specific error mapping. Mailpit yalnızca dev/test için; gerçek SMTP production adapter ayrıdır. Ayrıntılar: `docs/design/SMTP_MAILPIT_DESIGN.md`. Kabul: sandbox uçtan uca gönderim, teslim durumları ve güvenlik testleri.
+SMS send/status/callback, SMTP TLS/auth, e-posta API adapter, sender identity, attachments policy, DKIM/SPF/DMARC kurulum rehberi, provider-specific error mapping. Mailpit yalnızca dev/test için; gerçek SMTP production adapter ayrıdır. Ayrıntılar: `docs/design/SMTP_MAILPIT_DESIGN.md`. SMS (hesap, kontör, Netgsm adaptörü, gönderim API'si) ve BuildingFlow/TraceFlow geçişi: `docs/plans/SMS_INTEGRATION_ANALYSIS.md`. Kabul: sandbox uçtan uca gönderim, teslim durumları ve güvenlik testleri.
 
 ## PHASE-05 — Notification Core
 Notification API, event/outbox, templates TR/EN, variables/schema validation, preview, per-user preferences, transactional/marketing separation, consent, opt-out, quiet hours, scheduling, bulk, in-app inbox. Kabul: idempotent send, template versioning, izin testleri.

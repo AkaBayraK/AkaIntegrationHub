@@ -69,6 +69,7 @@ def settings(postgres: Any, valkey: Any, rabbitmq: Any) -> ApiSettings:
         secret_keys=f"k1:{SecretCipher.generate_key()}",
         smtp_allow_private_hosts=True,
         cache_allow_private_hosts=True,
+        sms_test_recipient_allowlist="+905551112233",
         rabbitmq=RabbitSettings(host=rabbitmq.host, port=rabbitmq.port, user="aih", password="test-only", vhost="aih"),
     )
 

@@ -1,6 +1,13 @@
 # Changelog
 
 ## [Unreleased]
+### SMS entegrasyonu
+- SMS hesapları (Test ve Netgsm; İleti Merkezi/Verimor/Turkcell planlı), Hub'da kontör ve kontör defteri,
+  idempotent gönderim API'si (`/sms/messages`), test SMS'i, gönderim kayıtları (maskeli numara, metin saklanmaz).
+- 3 adımlı gönderim: kontör ayırma → sağlayıcı → sonuç; kesin hatada iade, belirsiz sonuçta mutabakat.
+- SMS Hesapları ekranı ve üst menü; BuildingFlow/TraceFlow analizi ve geçiş planı `docs/plans/SMS_INTEGRATION_ANALYSIS.md`.
+- httpx artık API çalışma zamanı bağımlılığı; yeni ayar `AIH_SMS_TEST_RECIPIENT_ALLOWLIST`. Migration `202611031200`.
+
 ### Cache — Redis lisans beyanı
 - Redis hesaplarında lisans zorunlu: tür (AGPLv3, RSALv2, SSPLv1, Redis Enterprise, Redis Cloud), sahip, sözleşme no,
   bitiş tarihi, ticari lisans anahtarı (şifreli) ve sahiplik onayı (audit). Valkey hesapları lisans taşımaz.

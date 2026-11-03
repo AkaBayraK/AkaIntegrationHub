@@ -25,6 +25,8 @@ export { ConnectionTestResult } from './components/smtp/ConnectionTestResult';
 export { SendTestEmailPanel } from './components/smtp/SendTestEmailPanel';
 export { IntegrationsHome } from './components/integrations/IntegrationsHome';
 export { CacheAccountsPage, CACHE_BASE_PATH } from './components/cache/CacheAccountsPage';
+export { SmsAccountsPage, SMS_BASE_PATH } from './components/sms/SmsAccountsPage';
+export { SmsAccountForm, validateSmsForm } from './components/sms/SmsAccountForm';
 export { CacheAccountForm, validateCacheForm } from './components/cache/CacheAccountForm';
 export { ConsolePanel, safeConsoleUrl } from './components/console/ConsolePanel';
 export { INTEGRATION_TYPES, type IntegrationType, type IntegrationTypeId } from './components/integrations/catalog';

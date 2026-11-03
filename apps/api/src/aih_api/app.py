@@ -18,6 +18,8 @@ from aih_api.identity.verifier import TokenVerifier
 from aih_api.infrastructure import Infrastructure, database_url
 from aih_api.migrations import upgrade_to_head
 from aih_api.providers.cache.routes import router as cache_router
+from aih_api.providers.sms.gateways import default_gateways
+from aih_api.providers.sms.routes import router as sms_router
 from aih_api.providers.smtp.network import NetworkPolicy
 from aih_api.providers.smtp.routes import router as smtp_router
 from aih_api.secrets import SecretCipher, SecretStore
@@ -63,12 +65,14 @@ def create_app(
     app.state.cache_policy = _policy(
         settings.cache_allowed_ports, settings.cache_host_allowlist, allow_private=settings.cache_allow_private_hosts
     )
+    app.state.sms_gateways = default_gateways()
     install_error_handlers(app)
     app.include_router(system_router)
     app.include_router(identity_router)
     app.include_router(smtp_router)
     app.include_router(email_router)
     app.include_router(cache_router)
+    app.include_router(sms_router)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list(),

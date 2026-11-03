@@ -15,6 +15,7 @@ export const DEFAULT_NAV_ITEMS: readonly NavItem[] = [
   { path: '/', labelKey: 'nav.dashboard', icon: 'home' },
   { path: '/admin/email/providers', labelKey: 'nav.emailProviders', icon: 'mail' },
   { path: '/admin/email/deliveries', labelKey: 'nav.emailDeliveries', icon: 'history' },
+  { path: '/admin/sms/providers', labelKey: 'nav.sms', icon: 'type-sms' },
   { path: '/admin/cache/providers', labelKey: 'nav.cache', icon: 'type-cache' },
   { path: '/providers', labelKey: 'nav.providers', icon: 'layers' },
   { path: '/notifications', labelKey: 'nav.notifications', icon: 'bell' },

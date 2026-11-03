@@ -551,3 +551,21 @@
 .aih-detail__section > .aih-badge, .aih-detail__section > p { justify-self: start; margin: 0; }
 .aih-defined__head { flex-wrap: wrap; }
 .aih-defined__title { min-width: 150px; }
+
+/* SMS: satır içi panel, tablo ve kontör defteri */
+.aih-inline-form { gap: var(--aih-space-3); border-color: color-mix(in srgb, var(--aih-color-accent) 30%, var(--aih-color-border)); }
+.aih-table-wrap { overflow-x: auto; border: 1px solid var(--aih-color-border); border-radius: var(--aih-radius-md); }
+.aih-table-wrap .aih-table { margin: 0; }
+.aih-table__code { display: block; margin-top: 4px; font-size: 0.6875rem; color: var(--aih-color-danger); }
+.aih-table td .aih-badge { margin-left: var(--aih-space-2); }
+.aih-ledger { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--aih-space-2); }
+.aih-ledger__row {
+  display: grid; grid-template-columns: 110px 1fr auto auto; gap: var(--aih-space-3); align-items: center;
+  padding: var(--aih-space-2) var(--aih-space-3); border-radius: var(--aih-radius-md); border: 1px solid var(--aih-color-border);
+  font-size: 0.875rem;
+}
+.aih-ledger__row--in { border-left: 3px solid var(--aih-color-success); }
+.aih-ledger__row--out { border-left: 3px solid var(--aih-color-text-muted); }
+.aih-ledger__kind { font-weight: 600; }
+.aih-ledger__row--in .aih-ledger__qty { color: var(--aih-color-success); }
+@media (max-width: 720px) { .aih-ledger__row { grid-template-columns: 1fr auto; } }

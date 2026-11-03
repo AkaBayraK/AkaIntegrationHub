@@ -31,6 +31,8 @@ export function IntegrationsHome({ headerExtra }: { headerExtra?: ReactNode }) {
   const canReadCache = session.can('cache-account:read');
   const [smtpAccounts, setSmtpAccounts] = useState<SmtpAccount[] | null>(null);
   const [cacheCount, setCacheCount] = useState(0);
+  const [smsCount, setSmsCount] = useState(0);
+  const canReadSms = session.can('sms-account:read');
   const [error, setError] = useState<unknown>(null);
   const [filter, setFilter] = useState<Filter>('all');
   const [editing, setEditing] = useState(false);
@@ -63,11 +65,19 @@ export function IntegrationsHome({ headerExtra }: { headerExtra?: ReactNode }) {
       .catch(() => setCacheCount(0));
   }, [client, tenantId, canReadCache]);
 
+  useEffect(() => {
+    if (!tenantId || !canReadSms) return;
+    client
+      .listSmsAccounts(tenantId, { limit: 200 })
+      .then((page) => setSmsCount(page.items.length))
+      .catch(() => setSmsCount(0));
+  }, [client, tenantId, canReadSms]);
+
   if (session.loading) return <p role="status">{t('common.loading')}</p>;
   if (session.error) return <ErrorNotice error={session.error} onRetry={session.reload} />;
 
   const accounts = smtpAccounts ?? [];
-  const counts: Partial<Record<IntegrationTypeId, number>> = { email: accounts.length, cache: cacheCount };
+  const counts: Partial<Record<IntegrationTypeId, number>> = { email: accounts.length, cache: cacheCount, sms: smsCount };
   const problems = accounts.filter((a) => accountHealth(a) === 'failing').length;
   const healthy = accounts.filter((a) => accountHealth(a) === 'healthy').length;
   const visible = accounts.filter((a) => matchesFilter(a, filter));
