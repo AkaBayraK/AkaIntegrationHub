@@ -3,8 +3,8 @@
 **Ad:** Aka Integration Hub · **Kısa ad:** AIH · **Slogan:** Connect · Notify · Automate / Bağlan · Bildir · Otomatikleştir
 
 ## Logo
-Özgün "A-akış" işareti: yükselen iki kol bir "A" oluşturur, ortadaki dalgalı turkuaz çizgi veri akışını ve bağlantıyı
-temsil eder. `docs/brand/BRAND_CONCEPT.png` yalnızca ilham kaynağıdır; buradaki vektörler sıfırdan çizilmiştir.
+Özgün "Hub" işareti: merkezdeki çekirdeğe bağlı üç düğüm, BuildingFlow, TraceFlow ve diğer uygulamaların tek
+entegrasyon merkezinde buluşmasını temsil eder (2026-11-03, önceki "A-akış" işaretinin yerine). `docs/brand/BRAND_CONCEPT.png` yalnızca ilham kaynağıdır; buradaki vektörler sıfırdan çizilmiştir.
 
 | Dosya | Kullanım |
 |---|---|
