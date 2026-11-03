@@ -68,6 +68,7 @@ def settings(postgres: Any, valkey: Any, rabbitmq: Any) -> ApiSettings:
         auth_dev_mode=True,
         secret_keys=f"k1:{SecretCipher.generate_key()}",
         smtp_allow_private_hosts=True,
+        cache_allow_private_hosts=True,
         rabbitmq=RabbitSettings(host=rabbitmq.host, port=rabbitmq.port, user="aih", password="test-only", vhost="aih"),
     )
 

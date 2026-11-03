@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { HubApiError } from '../../api/client';
 import type {
   AccountEnvironment,
@@ -12,7 +12,8 @@ import type {
 import { useAkaIntegration, useTranslation } from '../../context';
 import type { MessageKey } from '../../i18n/messages';
 import { useHubClient, useHubSession } from '../../session';
-import { ErrorNotice, SMTP_BASE_PATH } from './shared';
+import { safeConsoleUrl } from '../console/ConsolePanel';
+import { ErrorNotice, Field, SMTP_BASE_PATH } from './shared';
 
 type FormState = SmtpAccountInput & { password: string; makeDefault: boolean };
 type Errors = Partial<Record<keyof FormState, MessageKey | string>>;
@@ -37,6 +38,7 @@ const EMPTY: FormState = {
   priority: 100,
   timeoutSeconds: 15,
   rateLimitPerMinute: null,
+  consoleUrl: null,
 };
 
 export function validateSmtpForm(state: FormState, opts: { creating: boolean; hasSecret: boolean }): Errors {
@@ -46,6 +48,7 @@ export function validateSmtpForm(state: FormState, opts: { creating: boolean; ha
   if (!Number.isInteger(state.port) || state.port < 1 || state.port > 65535) errors.port = 'smtp.form.error.port';
   if (!EMAIL.test(state.senderAddress.trim())) errors.senderAddress = 'smtp.form.error.email';
   if (state.replyTo && !EMAIL.test(state.replyTo.trim())) errors.replyTo = 'smtp.form.error.email';
+  if (state.consoleUrl?.trim() && !safeConsoleUrl(state.consoleUrl.trim())) errors.consoleUrl = 'console.error.url';
   if (state.environment === 'production' && state.tlsMode === 'none') errors.tlsMode = 'smtp.form.error.prodTls';
   if ((state.port === 587 && state.tlsMode === 'implicit') || (state.port === 465 && state.tlsMode === 'starttls')) {
     errors.port = 'smtp.form.error.portTls';
@@ -57,36 +60,6 @@ export function validateSmtpForm(state: FormState, opts: { creating: boolean; ha
   return errors;
 }
 
-function Field({
-  id,
-  label,
-  error,
-  help,
-  children,
-}: {
-  id: string;
-  label: string;
-  error?: string;
-  help?: ReactNode;
-  children: ReactNode;
-}) {
-  return (
-    <div className="aih-field">
-      <label htmlFor={id}>{label}</label>
-      {children}
-      {help && (
-        <small id={`${id}-help`} className="aih-notice">
-          {help}
-        </small>
-      )}
-      {error && (
-        <small id={`${id}-error`} className="aih-field__error" role="alert">
-          {error}
-        </small>
-      )}
-    </div>
-  );
-}
 
 export function SmtpAccountForm({ accountId, basePath = SMTP_BASE_PATH }: { accountId?: string; basePath?: string }) {
   const t = useTranslation();
@@ -183,6 +156,7 @@ export function SmtpAccountForm({ accountId, basePath = SMTP_BASE_PATH }: { acco
       priority: state.priority,
       timeoutSeconds: state.timeoutSeconds,
       rateLimitPerMinute: state.rateLimitPerMinute,
+      consoleUrl: state.consoleUrl?.trim() || null,
     };
     try {
       if (creating) {
@@ -221,7 +195,7 @@ export function SmtpAccountForm({ accountId, basePath = SMTP_BASE_PATH }: { acco
   const err = (key: keyof FormState) => {
     const value = errors[key];
     if (!value) return undefined;
-    return value.includes('.') && value.startsWith('smtp.') ? t(value as MessageKey) : value;
+    return value.startsWith('smtp.') || value.startsWith('console.') ? t(value as MessageKey) : value;
   };
   const describe = (key: keyof FormState, help = false) =>
     [errors[key] ? `aih-smtp-${key}-error` : null, help ? `aih-smtp-${key}-help` : null].filter(Boolean).join(' ') ||
@@ -461,6 +435,19 @@ export function SmtpAccountForm({ accountId, basePath = SMTP_BASE_PATH }: { acco
               />
             </Field>
           </div>
+          <Field id="aih-smtp-console" label={t('console.field')} error={err('consoleUrl')}>
+            <input
+              id="aih-smtp-console"
+              className="aih-input"
+              type="url"
+              placeholder="http://localhost:28025"
+              value={state.consoleUrl ?? ''}
+              aria-invalid={Boolean(errors.consoleUrl)}
+              aria-describedby={describe('consoleUrl')}
+              onChange={(e) => set('consoleUrl', e.target.value)}
+            />
+          </Field>
+          <p className="aih-notice">{t('console.fieldHint')}</p>
           <label className="aih-check">
             <input type="checkbox" checked={state.enabled} onChange={(e) => set('enabled', e.target.checked)} />
             <span>{t('smtp.form.enabled')}</span>

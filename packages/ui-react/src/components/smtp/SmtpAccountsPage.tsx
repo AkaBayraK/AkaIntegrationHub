@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import type { AccountEnvironment, ConnectionTest, ProviderType, SmtpAccount } from '../../api/types';
 import { useAkaIntegration, useTranslation } from '../../context';
 import { useHubClient, useHubSession } from '../../session';
+import { ConsolePanel } from '../console/ConsolePanel';
 import { ConnectionTestResult } from './ConnectionTestResult';
 import { SendTestEmailPanel } from './SendTestEmailPanel';
 import {
@@ -370,6 +371,8 @@ function AccountDetail({
         />
         <Fact label={t('smtp.col.lastSend')} value={formatDate(account.lastSuccessSendAt, locale.locale) ?? t('smtp.never')} />
       </dl>
+
+      <ConsolePanel url={account.consoleUrl} title={account.name} />
 
       <div className="aih-detail__test">
         <h3>

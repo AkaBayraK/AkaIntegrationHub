@@ -265,3 +265,11 @@ async def test_viewer_cannot_run_connection_test(env: Env, mailpit: Any) -> None
     account = await _create(env, mailpit_payload(mailpit, "Mailpit viewer"))
     viewer = env.auth(ISSUER_A, ["MANAGER"])
     assert (await env.api.post(f"{_base(env)}/{account['id']}/test-connection", headers=viewer)).status_code == 403
+
+
+async def test_console_url_is_stored_and_validated(env: Env) -> None:
+    account = await _create(env, custom_payload("Konsollu", consoleUrl="https://mail-ui.example.com/inbox"))
+    assert account["consoleUrl"] == "https://mail-ui.example.com/inbox"
+
+    bad = custom_payload("Kötü konsol", consoleUrl="javascript:alert(1)")
+    assert (await env.api.post(_base(env), json=bad, headers=env.auth())).status_code == 422

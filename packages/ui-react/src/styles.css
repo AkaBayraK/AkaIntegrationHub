@@ -392,3 +392,14 @@
 @media (max-width: 480px) {
   .aih-mini { grid-template-columns: 1fr 1fr; }
 }
+
+.aih-console {
+  display: grid; gap: var(--aih-space-3); padding: var(--aih-space-4);
+  border: 1px solid var(--aih-color-border); border-radius: var(--aih-radius-md); background: var(--aih-color-bg);
+}
+.aih-console__head { display: flex; justify-content: space-between; align-items: center; gap: var(--aih-space-3); flex-wrap: wrap; }
+.aih-console__head h3 { margin: 0 0 2px; font-size: 0.9375rem; }
+.aih-console__frame {
+  width: 100%; height: min(70vh, 720px); border: 1px solid var(--aih-color-border);
+  border-radius: var(--aih-radius-md); background: #fff;
+}

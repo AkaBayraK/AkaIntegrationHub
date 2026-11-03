@@ -8,9 +8,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Header, Path, Query, Request, Response
 
 from aih_api.db import Database
-from aih_api.errors import ApiError
 from aih_api.identity.deps import CurrentPrincipal, TenantScope, require
 from aih_api.identity.principal import Permission
+from aih_api.providers.common import mask, parse_if_match
 from aih_api.providers.smtp import service
 from aih_api.providers.smtp.capabilities import CAPABILITIES, AccountEnvironment, ProviderType
 from aih_api.providers.smtp.models import SmtpAccount
@@ -42,40 +42,17 @@ async def smtp_context(request: Request, scope: TenantScope) -> AsyncIterator[se
         )
 
 
-_MIN_MASKED_HOST_LABELS = 2
-
-
-def _mask(value: str | None) -> str | None:
-    if not value:
-        return value
-    head, at, domain = value.partition("@")
-    if at:
-        return (head[:1] + "***@" + domain) if head else value
-    parts = value.split(".")
-    return ".".join(["***", *parts[-2:]]) if len(parts) > _MIN_MASKED_HOST_LABELS else value[:1] + "***"
-
-
 def _out(account: SmtpAccount, scope: TenantScope) -> SmtpAccountOut:
     data = {name: getattr(account, name, None) for name in SmtpAccountOut.model_fields if name != "has_secret"}
     out = SmtpAccountOut.model_validate({**data, "has_secret": account.secret_ref is not None})
     if not scope.principal.can(Permission.SMTP_ACCOUNT_WRITE):
         # Viewer: bağlantı/kimlik ayrıntıları maskelenir.
-        out = out.model_copy(update={"host": _mask(out.host) or "", "username": _mask(out.username)})
+        out = out.model_copy(update={"host": mask(out.host) or "", "username": mask(out.username)})
     return out
 
 
 def _etag(response: Response, account: SmtpAccount) -> None:
     response.headers["ETag"] = f'W/"{account.version}"'
-
-
-def _version(if_match: str | None) -> int:
-    if not if_match:
-        raise ApiError(428, "AIH-COMMON-428", "If-Match başlığı gerekli")
-    raw = if_match.strip().removeprefix("W/").strip('"')
-    try:
-        return int(raw)
-    except ValueError as exc:
-        raise ApiError(400, "AIH-COMMON-400", "Geçersiz If-Match değeri") from exc
 
 
 IfMatch = Annotated[str | None, Header(alias="If-Match")]
@@ -161,7 +138,7 @@ async def update_account(
     scope: WriteScope,
     if_match: IfMatch = None,
 ) -> SmtpAccountOut:
-    expected = _version(if_match)
+    expected = parse_if_match(if_match)
     async with smtp_context(request, scope) as ctx:
         account = await service.update_account(ctx, account_id, payload, expected)
         _etag(response, account)
@@ -177,7 +154,7 @@ async def rotate_secret(
     scope: WriteScope,
     if_match: IfMatch = None,
 ) -> SmtpAccountOut:
-    expected = _version(if_match)
+    expected = parse_if_match(if_match)
     async with smtp_context(request, scope) as ctx:
         account = await service.rotate_secret(ctx, account_id, payload.password.get_secret_value(), expected)
         _etag(response, account)
@@ -188,7 +165,7 @@ async def rotate_secret(
 async def make_default(
     request: Request, response: Response, account_id: AccountId, scope: WriteScope, if_match: IfMatch = None
 ) -> SmtpAccountOut:
-    expected = _version(if_match)
+    expected = parse_if_match(if_match)
     async with smtp_context(request, scope) as ctx:
         account = await service.make_default(ctx, account_id, expected)
         _etag(response, account)

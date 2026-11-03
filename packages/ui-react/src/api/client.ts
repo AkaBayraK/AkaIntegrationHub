@@ -1,4 +1,9 @@
 import type {
+  CacheAccount,
+  CacheAccountCreate,
+  CacheAccountInput,
+  CacheCapability,
+  CacheConnectionTest,
   ConnectionTest,
   EmailDelivery,
   Me,
@@ -85,6 +90,8 @@ export function createHubClient(options: HubClientOptions) {
   const tenantPath = (tenantId: string) => `/v1/tenants/${encodeURIComponent(tenantId)}`;
   const accountPath = (tenantId: string, id: string) =>
     `${tenantPath(tenantId)}/smtp-accounts/${encodeURIComponent(id)}`;
+  const cachePath = (tenantId: string, id: string) =>
+    `${tenantPath(tenantId)}/cache-accounts/${encodeURIComponent(id)}`;
   const ifMatch = (version: number) => ({ 'If-Match': `W/"${version}"` });
 
   return {
@@ -123,6 +130,22 @@ export function createHubClient(options: HubClientOptions) {
       ).data,
     listEmailDeliveries: async (tenantId: string, query: { accountId?: string; status?: string; limit?: number } = {}) =>
       (await request<EmailDelivery[]>('GET', `${tenantPath(tenantId)}/email-deliveries`, { query })).data,
+    cacheCapabilities: async () => (await request<CacheCapability[]>('GET', '/v1/provider-types/cache')).data,
+    listCacheAccounts: async (tenantId: string, query: { q?: string; limit?: number } = {}) =>
+      (await request<Page<CacheAccount>>('GET', `${tenantPath(tenantId)}/cache-accounts`, { query })).data,
+    createCacheAccount: async (tenantId: string, body: CacheAccountCreate) =>
+      (await request<CacheAccount>('POST', `${tenantPath(tenantId)}/cache-accounts`, { body })).data,
+    updateCacheAccount: async (
+      tenantId: string,
+      id: string,
+      version: number,
+      body: Partial<CacheAccountInput> & { password?: string },
+    ) => (await request<CacheAccount>('PATCH', cachePath(tenantId, id), { body, headers: ifMatch(version) })).data,
+    makeDefaultCacheAccount: async (tenantId: string, id: string, version: number) =>
+      (await request<CacheAccount>('POST', `${cachePath(tenantId, id)}/make-default`, { headers: ifMatch(version) }))
+        .data,
+    testCacheConnection: async (tenantId: string, id: string) =>
+      (await request<CacheConnectionTest>('POST', `${cachePath(tenantId, id)}/test-connection`)).data,
   };
 }
 

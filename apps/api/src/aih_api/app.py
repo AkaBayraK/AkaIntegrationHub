@@ -17,6 +17,7 @@ from aih_api.identity.routes import router as identity_router
 from aih_api.identity.verifier import TokenVerifier
 from aih_api.infrastructure import Infrastructure, database_url
 from aih_api.migrations import upgrade_to_head
+from aih_api.providers.cache.routes import router as cache_router
 from aih_api.providers.smtp.network import NetworkPolicy
 from aih_api.providers.smtp.routes import router as smtp_router
 from aih_api.secrets import SecretCipher, SecretStore
@@ -56,16 +57,18 @@ def create_app(
     app.state.db = Database(infra.engine)
     app.state.token_verifier = token_verifier or TokenVerifier()
     app.state.secret_store = SecretStore(SecretCipher(settings.secret_keys))
-    app.state.smtp_policy = NetworkPolicy(
-        allow_private=settings.smtp_allow_private_hosts,
-        allowed_ports=frozenset(int(p) for p in settings.smtp_allowed_ports.split(",") if p.strip()),
-        host_allowlist=tuple(h.strip().lower() for h in settings.smtp_host_allowlist.split(",") if h.strip()),
+    app.state.smtp_policy = _policy(
+        settings.smtp_allowed_ports, settings.smtp_host_allowlist, allow_private=settings.smtp_allow_private_hosts
+    )
+    app.state.cache_policy = _policy(
+        settings.cache_allowed_ports, settings.cache_host_allowlist, allow_private=settings.cache_allow_private_hosts
     )
     install_error_handlers(app)
     app.include_router(system_router)
     app.include_router(identity_router)
     app.include_router(smtp_router)
     app.include_router(email_router)
+    app.include_router(cache_router)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list(),
@@ -83,6 +86,14 @@ def create_app(
     )
     app.add_middleware(CorrelationIdMiddleware)
     return app
+
+
+def _policy(ports: str, allowlist: str, *, allow_private: bool) -> NetworkPolicy:
+    return NetworkPolicy(
+        allow_private=allow_private,
+        allowed_ports=frozenset(int(p) for p in ports.split(",") if p.strip()),
+        host_allowlist=tuple(h.strip().lower() for h in allowlist.split(",") if h.strip()),
+    )
 
 
 def create_management_app(infra: Infrastructure) -> Starlette:

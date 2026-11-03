@@ -5,9 +5,10 @@ import uuid
 from datetime import datetime
 from typing import Annotated, Any
 
-from pydantic import AfterValidator, BaseModel, ConfigDict, Field, SecretStr, field_validator
+from pydantic import AfterValidator, ConfigDict, Field, SecretStr, field_validator
 from pydantic.alias_generators import to_camel
 
+from aih_api.providers.common import ApiModel, ConsoleUrl, strip_single_line
 from aih_api.providers.smtp.capabilities import AccountEnvironment, AuthMode, ProviderType, TlsMode
 
 _EMAIL = re.compile(
@@ -26,19 +27,6 @@ def _email(value: str) -> str:
 
 
 EmailAddress = Annotated[str, AfterValidator(_email)]
-
-
-def _strip_single_line(value: str | None) -> str | None:
-    if value is None:
-        return None
-    stripped = value.strip()
-    if any(ch in stripped for ch in "\r\n\x00"):
-        raise ValueError("satır sonu veya kontrol karakteri içeremez")
-    return stripped
-
-
-class ApiModel(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True, extra="forbid")
 
 
 class CapabilityOut(ApiModel):
@@ -71,8 +59,9 @@ class SmtpAccountBase(ApiModel):
     priority: int = Field(default=100, ge=0, le=10_000)
     timeout_seconds: int = Field(default=15, ge=1, le=120)
     rate_limit_per_minute: int | None = Field(default=None, ge=1, le=100_000)
+    console_url: ConsoleUrl | None = None
 
-    _strip = field_validator("name", "host", "username", "sender_name")(_strip_single_line)
+    _strip = field_validator("name", "host", "username", "sender_name")(strip_single_line)
 
 
 class SmtpAccountCreate(SmtpAccountBase):
@@ -97,8 +86,9 @@ class SmtpAccountUpdate(ApiModel):
     priority: int | None = Field(default=None, ge=0, le=10_000)
     timeout_seconds: int | None = Field(default=None, ge=1, le=120)
     rate_limit_per_minute: int | None = Field(default=None, ge=1, le=100_000)
+    console_url: ConsoleUrl | None = None
 
-    _strip = field_validator("name", "host", "username", "sender_name")(_strip_single_line)
+    _strip = field_validator("name", "host", "username", "sender_name")(strip_single_line)
 
 
 class SecretRotate(ApiModel):
@@ -128,6 +118,7 @@ class SmtpAccountOut(ApiModel):
     priority: int
     timeout_seconds: int
     rate_limit_per_minute: int | None
+    console_url: str | None
     last_test_at: datetime | None
     last_test_outcome: str | None
     last_success_send_at: datetime | None

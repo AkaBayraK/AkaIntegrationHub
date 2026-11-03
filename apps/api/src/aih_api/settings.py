@@ -37,6 +37,11 @@ class ApiSettings(BaseSettings):
     # Kendi adresiniz ve gönderen alan adı her zaman izinlidir.
     smtp_test_recipient_allowlist: str = ""
 
+    # Cache hedef politikası (SSRF). Özel ağ yalnız local/dev/test'te açılabilir.
+    cache_allow_private_hosts: bool = False
+    cache_allowed_ports: str = "6379,6380"
+    cache_host_allowlist: str = ""
+
     valkey_host: str = "localhost"
     valkey_port: int = 26379
     valkey_password: str = ""
@@ -59,6 +64,8 @@ class ApiSettings(BaseSettings):
             raise ValueError("AIH_AUTH_DEV_MODE yalnız local/test ortamında etkinleştirilebilir")
         if self.smtp_allow_private_hosts and self.environment in ("staging", "prod"):
             raise ValueError("AIH_SMTP_ALLOW_PRIVATE_HOSTS staging/prod ortamında etkinleştirilemez")
+        if self.cache_allow_private_hosts and self.environment in ("staging", "prod"):
+            raise ValueError("AIH_CACHE_ALLOW_PRIVATE_HOSTS staging/prod ortamında etkinleştirilemez")
         if self.environment in ("staging", "prod") and not self.secret_keys:
             raise ValueError("AIH_SECRET_KEYS staging/prod ortamında zorunludur")
         return self

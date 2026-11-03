@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import base64
 import time
 import uuid
 from dataclasses import dataclass
@@ -15,6 +14,7 @@ from sqlalchemy.orm.exc import StaleDataError
 from aih_api.audit import service as audit
 from aih_api.errors import ApiError
 from aih_api.identity.principal import Principal
+from aih_api.providers.common import StepRecorder, decode_cursor, encode_cursor
 from aih_api.providers.smtp.capabilities import (
     CAPABILITIES,
     AccountEnvironment,
@@ -22,7 +22,7 @@ from aih_api.providers.smtp.capabilities import (
     ProviderType,
     TlsMode,
 )
-from aih_api.providers.smtp.client import SmtpError, SmtpTarget, StepRecorder, smtp_session
+from aih_api.providers.smtp.client import SmtpError, SmtpTarget, smtp_session
 from aih_api.providers.smtp.models import SmtpAccount, SmtpConnectionTest
 from aih_api.providers.smtp.network import NetworkPolicy, TargetNotAllowedError
 from aih_api.providers.smtp.schemas import SmtpAccountCreate, SmtpAccountUpdate
@@ -191,7 +191,7 @@ async def list_accounts(
     limit: int,
     cursor: str | None,
 ) -> tuple[list[SmtpAccount], str | None]:
-    offset = _decode_cursor(cursor)
+    offset = decode_cursor(cursor)
     query = select(SmtpAccount).where(SmtpAccount.tenant_id == ctx.tenant_id)
     if environment is not None:
         query = query.where(SmtpAccount.environment == environment.value)
@@ -206,26 +206,8 @@ async def list_accounts(
         SmtpAccount.environment, SmtpAccount.is_default.desc(), SmtpAccount.priority, SmtpAccount.name
     )
     rows = list((await ctx.session.execute(query.offset(offset).limit(limit + 1))).scalars())
-    next_cursor = _encode_cursor(offset + limit) if len(rows) > limit else None
+    next_cursor = encode_cursor(offset + limit) if len(rows) > limit else None
     return rows[:limit], next_cursor
-
-
-def _encode_cursor(offset: int) -> str:
-    return base64.urlsafe_b64encode(f"o:{offset}".encode()).decode().rstrip("=")
-
-
-def _decode_cursor(cursor: str | None) -> int:
-    if not cursor:
-        return 0
-    try:
-        raw = base64.urlsafe_b64decode(cursor + "=" * (-len(cursor) % 4)).decode()
-        kind, _, value = raw.partition(":")
-        offset = int(value)
-    except ValueError as exc:
-        raise DomainError(400, "AIH-COMMON-400", "Geçersiz cursor", "cursor") from exc
-    if kind != "o" or offset < 0:
-        raise DomainError(400, "AIH-COMMON-400", "Geçersiz cursor", "cursor")
-    return offset
 
 
 def _check_version(account: SmtpAccount, expected: int) -> None:

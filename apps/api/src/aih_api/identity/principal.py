@@ -17,13 +17,18 @@ class Permission(StrEnum):
     SMTP_ACCOUNT_TEST = "smtp-account:test"
     SMTP_ACCOUNT_SEND_TEST = "smtp-account:send-test"
     EMAIL_DELIVERY_READ = "email-delivery:read"
+    CACHE_ACCOUNT_READ = "cache-account:read"
+    CACHE_ACCOUNT_WRITE = "cache-account:write"
+    CACHE_ACCOUNT_TEST = "cache-account:test"
 
 
 # Rol → izin eşlemesi kodda sabittir (ADR-0006). Listede olmayan her şey reddedilir.
 ROLE_PERMISSIONS: dict[Role, frozenset[Permission]] = {
     Role.PLATFORM_ADMIN: frozenset(Permission),
     Role.TENANT_ADMIN: frozenset(Permission),
-    Role.VIEWER: frozenset({Permission.SMTP_ACCOUNT_READ, Permission.EMAIL_DELIVERY_READ}),
+    Role.VIEWER: frozenset(
+        {Permission.SMTP_ACCOUNT_READ, Permission.EMAIL_DELIVERY_READ, Permission.CACHE_ACCOUNT_READ}
+    ),
 }
 
 

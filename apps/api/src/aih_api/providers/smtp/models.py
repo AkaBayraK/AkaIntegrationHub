@@ -36,6 +36,7 @@ class SmtpAccount(Base):
     priority: Mapped[int] = mapped_column(Integer, default=100)
     timeout_seconds: Mapped[int] = mapped_column(Integer, default=15)
     rate_limit_per_minute: Mapped[int | None] = mapped_column(Integer)
+    console_url: Mapped[str | None] = mapped_column(String(2048))
     last_test_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     last_test_outcome: Mapped[str | None] = mapped_column(String(16))
     last_success_send_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

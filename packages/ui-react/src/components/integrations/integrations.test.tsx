@@ -12,7 +12,7 @@ const HEALTHY: SmtpAccount = {
   id: 'acc-1', tenantId: TENANT, projectId: null, name: 'Kurumsal Bildirim', providerType: 'microsoft_365',
   host: 'smtp.office365.com', port: 587, tlsMode: 'starttls', authMode: 'smtp_auth', username: 'u', hasSecret: true,
   senderAddress: 'noreply@example.com', senderName: null, replyTo: null, environment: 'production', enabled: true,
-  isDefault: true, priority: 1, timeoutSeconds: 30, rateLimitPerMinute: null, lastTestAt: '2026-11-02T10:00:00Z',
+  isDefault: true, priority: 1, timeoutSeconds: 30, rateLimitPerMinute: null, consoleUrl: null, lastTestAt: '2026-11-02T10:00:00Z',
   lastTestOutcome: 'passed', lastSuccessSendAt: null, version: 1, createdAt: '2026-11-02T10:00:00Z', createdBy: 'u',
   updatedAt: '2026-11-02T10:00:00Z', updatedBy: 'u',
 };
@@ -29,7 +29,9 @@ function render_(permissions: string[], accounts: SmtpAccount[], navigate = vi.f
       const url = new URL(String(input));
       const body = url.pathname === '/v1/me'
         ? { subject: 'u1', displayName: null, email: null, tenant: { id: TENANT, slug: 'bf', name: 'BuildingFlow' }, roles: [], permissions }
-        : { items: accounts, nextCursor: null };
+        : url.pathname.endsWith('/cache-accounts')
+          ? { items: [{ id: 'cache-1' }], nextCursor: null }
+          : { items: accounts, nextCursor: null };
       return new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
     }),
   );
@@ -50,7 +52,7 @@ function render_(permissions: string[], accounts: SmtpAccount[], navigate = vi.f
   return navigate;
 }
 
-const ADMIN = ['smtp-account:read', 'smtp-account:write'];
+const ADMIN = ['smtp-account:read', 'smtp-account:write', 'cache-account:read'];
 
 describe('IntegrationsHome', () => {
   it('shows integration types, marks unbuilt ones as coming soon and opens the email page', async () => {
@@ -59,7 +61,8 @@ describe('IntegrationsHome', () => {
     const types = screen.getByRole('region', { name: 'Yeni entegrasyon ekle' });
     const email = within(types).getByRole('link', { name: /E-posta \(SMTP\)/ });
     expect(email.closest('.aih-type')).toHaveTextContent('2 tanımlı');
-    expect(screen.getByText('Cache (Redis / Valkey)').closest('.aih-type')).toHaveTextContent('Yakında');
+    expect(screen.getByText('Mesaj Kuyruğu').closest('.aih-type')).toHaveTextContent('Yakında');
+    expect(within(types).getByRole('link', { name: /Cache \(Valkey \/ Redis\)/ }).closest('.aih-type')).toHaveTextContent('1 tanımlı');
 
     fireEvent.click(email);
     expect(navigate).toHaveBeenCalledWith('/admin/email/providers');
@@ -83,17 +86,17 @@ describe('IntegrationsHome', () => {
     render_(ADMIN, [HEALTHY]);
     await screen.findByText('Kurumsal Bildirim');
     const types = screen.getByRole('region', { name: 'Yeni entegrasyon ekle' });
-    const names = () => within(types).getAllByText(/^(E-posta \(SMTP\)|Cache \(Redis \/ Valkey\))$/).map((n) => n.textContent);
-    expect(names()).toEqual(['E-posta (SMTP)', 'Cache (Redis / Valkey)']);
+    const names = () => within(types).getAllByText(/^(E-posta \(SMTP\)|Cache \(Valkey \/ Redis\))$/).map((n) => n.textContent);
+    expect(names()).toEqual(['E-posta (SMTP)', 'Cache (Valkey / Redis)']);
 
     fireEvent.click(screen.getByRole('button', { name: 'Düzeni değiştir' }));
     fireEvent.click(screen.getByRole('button', { name: 'Arkaya al: E-posta (SMTP)' }));
 
-    expect(names()).toEqual(['Cache (Redis / Valkey)', 'E-posta (SMTP)']);
+    expect(names()).toEqual(['Cache (Valkey / Redis)', 'E-posta (SMTP)']);
     expect(window.localStorage.getItem('aih.layout.hub-types.u1')).toContain('"cache"');
 
     fireEvent.click(screen.getByRole('button', { name: 'Varsayılana dön' }));
-    expect(names()).toEqual(['E-posta (SMTP)', 'Cache (Redis / Valkey)']);
+    expect(names()).toEqual(['E-posta (SMTP)', 'Cache (Valkey / Redis)']);
     fireEvent.click(screen.getByRole('button', { name: 'Bitti' }));
     expect(screen.queryByRole('button', { name: 'Arkaya al: E-posta (SMTP)' })).not.toBeInTheDocument();
   });

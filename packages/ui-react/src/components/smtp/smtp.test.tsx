@@ -30,6 +30,7 @@ const ACCOUNT: SmtpAccount = {
   priority: 100,
   timeoutSeconds: 15,
   rateLimitPerMinute: null,
+  consoleUrl: null,
   lastTestAt: null,
   lastTestOutcome: null,
   lastSuccessSendAt: null,
@@ -195,7 +196,7 @@ describe('SmtpAccountForm', () => {
       name: 'x', providerType: 'custom_smtp' as const, host: 'h', port: 465, tlsMode: 'starttls' as const,
       authMode: 'smtp_auth' as const, username: 'u', password: '', senderAddress: 'bad', senderName: '',
       replyTo: '', environment: 'production' as const, enabled: true, makeDefault: false, priority: 1,
-      timeoutSeconds: 15, rateLimitPerMinute: null,
+      timeoutSeconds: 15, rateLimitPerMinute: null, consoleUrl: null,
     };
     const errors = validateSmtpForm(base, { creating: true, hasSecret: false });
     expect(errors.port).toBe('smtp.form.error.portTls');

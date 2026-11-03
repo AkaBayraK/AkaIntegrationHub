@@ -6,14 +6,13 @@ Hata mesajları sağlayıcıdan gelen ham metni içermez; yalnız sınıflandır
 from __future__ import annotations
 
 import ssl
-import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from dataclasses import dataclass, field
-from typing import Any
+from dataclasses import dataclass
 
 import aiosmtplib
 
+from aih_api.providers.common import StepRecorder
 from aih_api.providers.smtp.capabilities import AuthMode, TlsMode
 from aih_api.providers.smtp.network import NetworkPolicy, TargetNotAllowedError, open_socket
 from aih_api.secrets import SecretValue
@@ -28,41 +27,6 @@ class SmtpTarget:
     username: str | None
     secret: SecretValue | None
     timeout: float
-
-
-@dataclass
-class Step:
-    name: str
-    outcome: str = "skipped"
-    duration_ms: int = 0
-    error_code: str | None = None
-
-    def as_dict(self) -> dict[str, Any]:
-        return {
-            "step": self.name,
-            "outcome": self.outcome,
-            "durationMs": self.duration_ms,
-            "errorCode": self.error_code,
-        }
-
-
-@dataclass
-class StepRecorder:
-    steps: list[Step] = field(default_factory=list)
-
-    @asynccontextmanager
-    async def step(self, name: str) -> AsyncIterator[Step]:
-        current = Step(name)
-        self.steps.append(current)
-        started = time.perf_counter()
-        try:
-            yield current
-            current.outcome = "passed"
-        except Exception:
-            current.outcome = "failed"
-            raise
-        finally:
-            current.duration_ms = int((time.perf_counter() - started) * 1000)
 
 
 class SmtpError(Exception):

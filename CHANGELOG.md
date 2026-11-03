@@ -1,6 +1,15 @@
 # Changelog
 
 ## [Unreleased]
+### Cache (Valkey) entegrasyonu ve yönetim arayüzü
+- Cache hesapları: Valkey (önerilen) ve müşterinin kendi Redis sunucusu; ACL/şifre (şifreli saklanır), TLS, veritabanı
+  ve anahtar ön eki, tenant + ortam başına tek varsayılan, RLS. API: `/v1/tenants/{id}/cache-accounts`.
+- Bağlantı testi DNS/TCP/TLS/AUTH/SELECT/PING adımlarını SSRF politikasıyla doğrulanmış IP üzerinden dener ve
+  sunucu özetini (sürüm, bellek, istemci, anahtar sayısı) gösterir; yapılandırma ayrıntısı dışarı verilmez.
+- SMTP ve cache hesaplarına "Yönetim arayüzü adresi": detayda yeni sekmede açma ve sayfa içinde gösterme (sandbox iframe).
+- Ortak sağlayıcı yardımcıları `aih_api.providers.common` altında toplandı. Yeni ayar: `AIH_CACHE_ALLOW_PRIVATE_HOSTS`,
+  `AIH_CACHE_ALLOWED_PORTS`, `AIH_CACHE_HOST_ALLOWLIST`.
+
 ### Kalite — Python kodlama standartları
 - `docs/standards/PYTHON_CODING_STANDARDS.md`: stil, tasarım, tip, hata/log, Fortify/OWASP eşlemesi, test ve PR kalite kapısı (≥ 8,5).
 - ruff kural seti genişletildi (karmaşıklık ≤ 10, positional parametre ≤ 5, sihirli sayı, kör `except`, `assert` yasağı);

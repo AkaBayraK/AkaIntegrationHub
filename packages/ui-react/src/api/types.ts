@@ -42,6 +42,7 @@ export interface SmtpAccountInput {
   priority: number;
   timeoutSeconds: number;
   rateLimitPerMinute: number | null;
+  consoleUrl: string | null;
 }
 
 export interface SmtpAccountCreate extends SmtpAccountInput {
@@ -63,6 +64,74 @@ export interface SmtpAccount extends SmtpAccountInput {
   createdBy: string;
   updatedAt: string;
   updatedBy: string;
+}
+
+export type CacheProviderType = 'valkey' | 'redis';
+export type CacheAuthMode = 'none' | 'password' | 'acl';
+
+export interface CacheCapability {
+  type: CacheProviderType;
+  label: string;
+  defaultPort: number;
+  licenseNote: string;
+}
+
+export interface CacheAccountInput {
+  name: string;
+  host: string;
+  port: number;
+  tlsEnabled: boolean;
+  authMode: CacheAuthMode;
+  username: string | null;
+  databaseIndex: number;
+  keyPrefix: string | null;
+  environment: AccountEnvironment;
+  enabled: boolean;
+  timeoutSeconds: number;
+  consoleUrl: string | null;
+}
+
+export interface CacheAccountCreate extends CacheAccountInput {
+  providerType: CacheProviderType;
+  password?: string | null;
+  makeDefault?: boolean;
+}
+
+export interface CacheAccount extends CacheAccountInput {
+  id: string;
+  tenantId: string;
+  projectId: string | null;
+  providerType: CacheProviderType;
+  hasSecret: boolean;
+  isDefault: boolean;
+  lastTestAt: string | null;
+  lastTestOutcome: 'passed' | 'failed' | null;
+  serverVersion: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CacheServerInfo {
+  serverName: string | null;
+  version: string | null;
+  mode: string | null;
+  role: string | null;
+  uptimeSeconds: number | null;
+  connectedClients: number | null;
+  usedMemory: string | null;
+  maxMemory: string | null;
+  evictionPolicy: string | null;
+  keyspace: Record<string, number>;
+}
+
+export interface CacheConnectionTest {
+  accountId: string;
+  outcome: 'passed' | 'failed';
+  errorCode: string | null;
+  steps: TestStep[];
+  durationMs: number;
+  server: CacheServerInfo | null;
 }
 
 export interface Page<T> {

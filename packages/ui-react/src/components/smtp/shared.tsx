@@ -40,7 +40,7 @@ export const HEALTH_TONES: Record<AccountHealth, 'success' | 'danger' | 'warning
   disabled: 'neutral',
 };
 
-export function accountHealth(account: SmtpAccount): AccountHealth {
+export function accountHealth(account: Pick<SmtpAccount, 'enabled' | 'lastTestOutcome'>): AccountHealth {
   if (!account.enabled) return 'disabled';
   if (account.lastTestOutcome === 'failed') return 'failing';
   if (account.lastTestOutcome === 'passed') return 'healthy';
@@ -139,6 +139,37 @@ export function ConfirmPanel({
           {t('common.no')}
         </button>
       </div>
+    </div>
+  );
+}
+
+export function Field({
+  id,
+  label,
+  error,
+  help,
+  children,
+}: {
+  id: string;
+  label: string;
+  error?: string;
+  help?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <div className="aih-field">
+      <label htmlFor={id}>{label}</label>
+      {children}
+      {help && (
+        <small id={`${id}-help`} className="aih-notice">
+          {help}
+        </small>
+      )}
+      {error && (
+        <small id={`${id}-error`} className="aih-field__error" role="alert">
+          {error}
+        </small>
+      )}
     </div>
   );
 }

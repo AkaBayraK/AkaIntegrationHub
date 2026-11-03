@@ -14,9 +14,10 @@ from aih_api.email.models import EmailDelivery, EmailDeliveryAttempt
 from aih_api.errors import ApiError
 from aih_api.identity.deps import TenantScope, require
 from aih_api.identity.principal import Permission
+from aih_api.providers.common import ApiModel
 from aih_api.providers.smtp import service as smtp_service
 from aih_api.providers.smtp.routes import smtp_context
-from aih_api.providers.smtp.schemas import ApiModel, EmailAddress
+from aih_api.providers.smtp.schemas import EmailAddress
 
 router = APIRouter(prefix="/v1", tags=["email"])
 _IDEMPOTENCY = re.compile(r"^[A-Za-z0-9._:-]{8,128}$")
