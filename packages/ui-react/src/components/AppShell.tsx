@@ -73,7 +73,7 @@ export function AppShell({
                   <a
                     href={item.path}
                     aria-current={active ? 'page' : undefined}
-                    className={active ? 'aih-tab aih-tab--active' : 'aih-tab'}
+                    className={active ? 'aih-navtab aih-navtab--active' : 'aih-navtab'}
                     onClick={go(item.path)}
                   >
                     {t(item.labelKey)}

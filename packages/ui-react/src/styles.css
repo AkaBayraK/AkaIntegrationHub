@@ -22,13 +22,13 @@
 .aih-nav-link:hover { color: var(--aih-color-text); background: var(--aih-color-surface); }
 .aih-shell__tabs { margin-inline: auto; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
 .aih-shell__tabs ul { list-style: none; margin: 0; padding: 0; display: flex; gap: var(--aih-space-1); }
-.aih-tab {
+.aih-navtab {
   display: block; padding: var(--aih-space-2) var(--aih-space-4); border-radius: 999px;
   color: var(--aih-color-text-muted); text-decoration: none; white-space: nowrap; font-weight: 500;
   transition: background-color 120ms ease, color 120ms ease;
 }
-.aih-tab:hover { color: var(--aih-color-text); background: var(--aih-color-bg); }
-.aih-tab--active, .aih-tab--active:hover { background: var(--aih-color-text); color: var(--aih-color-surface); }
+.aih-navtab:hover { color: var(--aih-color-text); background: var(--aih-color-bg); }
+.aih-navtab--active, .aih-navtab--active:hover { background: var(--aih-color-text); color: var(--aih-color-surface); }
 .aih-shell__actions { display: flex; align-items: center; gap: var(--aih-space-2); }
 .aih-shell__tools { gap: var(--aih-space-2); padding-inline: var(--aih-space-2); }
 .aih-locale { position: relative; }
@@ -245,12 +245,40 @@
 .aih-dot--warning { background: #d97706; }
 .aih-dot--neutral { background: var(--aih-color-text-muted); }
 
-.aih-type-grid, .aih-defined-grid { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--aih-space-4); }
-.aih-type-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
-.aih-defined-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.aih-sortable { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--aih-space-6) var(--aih-space-4); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 720px) { .aih-sortable { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1200px) {
+  .aih-sortable { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .aih-sortable__card--span-2 { grid-column: span 2; }
+}
+.aih-sortable__card { position: relative; min-width: 0; display: flex; flex-direction: column; border-radius: var(--aih-radius-lg); transition: opacity 0.15s, box-shadow 0.15s; }
+.aih-sortable__card > :last-child { flex: 1; }
+.aih-sortable__card.is-dragging { opacity: 0.45; }
+.aih-sortable__card.is-target { box-shadow: 0 0 0 2px var(--aih-color-bg), 0 0 0 4px var(--aih-color-accent); }
+.aih-sortable--editing .aih-sortable__card { outline: 1px dashed color-mix(in srgb, var(--aih-color-accent) 45%, transparent); outline-offset: 4px; }
+.aih-sortable__tools {
+  position: absolute; z-index: 2; top: -14px; right: 14px; display: flex; align-items: center; gap: 2px; padding: 2px;
+  background: var(--aih-color-surface); border: 1px solid var(--aih-color-border); border-radius: 999px;
+  box-shadow: 0 2px 6px rgb(11 27 63 / 0.08);
+}
+.aih-sortable__tools button {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 6px;
+  font: inherit; font-size: 0.8125rem; font-weight: 600; line-height: 1; color: var(--aih-color-text-muted);
+  background: transparent; border: 0; border-radius: 999px; cursor: pointer;
+}
+.aih-sortable__tools button:hover:not(:disabled) { background: var(--aih-color-bg); color: var(--aih-color-text); }
+.aih-sortable__tools button:focus-visible { outline: 2px solid var(--aih-color-focus); outline-offset: 1px; }
+.aih-sortable__tools button:disabled { opacity: 0.35; cursor: default; }
+.aih-sortable__tools svg { width: 15px; height: 15px; }
+.aih-sortable__grip { cursor: grab; }
+.aih-sortable__grip:active { cursor: grabbing; }
+.aih-sortable__sizes { display: inline-flex; margin: 0 2px; padding: 1px; border-radius: 999px; background: var(--aih-color-bg); }
+.aih-sortable__sizes button[aria-checked="true"],
+.aih-sortable__sizes button[aria-checked="true"]:hover { background: var(--aih-color-accent); color: var(--aih-color-accent-text); }
+@media (max-width: 1199px) { .aih-sortable__sizes { display: none; } }
 .aih-type {
-  height: 100%; display: flex; flex-direction: column; justify-content: space-between; gap: var(--aih-space-3);
-  padding: var(--aih-space-4); background: var(--aih-color-surface); border: 1px solid var(--aih-color-border);
+  height: 100%; min-height: 188px; display: flex; flex-direction: column; justify-content: space-between; gap: var(--aih-space-4);
+  padding: var(--aih-space-6); background: var(--aih-color-surface); border: 1px solid var(--aih-color-border);
   border-radius: var(--aih-radius-lg); transition: border-color 0.15s, box-shadow 0.15s;
 }
 .aih-type:not(.aih-type--soon):hover {
@@ -260,8 +288,10 @@
 .aih-type--soon { opacity: 0.6; }
 .aih-type__head { display: flex; gap: var(--aih-space-3); align-items: center; color: inherit; text-decoration: none; }
 .aih-type__link:focus-visible { outline: 3px solid var(--aih-color-focus); outline-offset: 4px; border-radius: var(--aih-radius-sm); }
-.aih-type__name { display: block; font-weight: 700; }
-.aih-type__desc { display: block; font-size: 0.8125rem; color: var(--aih-color-text-muted); }
+.aih-type__head { align-items: flex-start; }
+.aih-type__head .aih-mark { width: 48px; height: 48px; font-size: 1.375rem; flex-shrink: 0; }
+.aih-type__name { display: block; font-weight: 700; font-size: 1.0625rem; margin-bottom: 4px; }
+.aih-type__desc { display: block; font-size: 0.875rem; line-height: 1.45; color: var(--aih-color-text-muted); }
 .aih-type__foot {
   display: flex; justify-content: space-between; align-items: center; gap: var(--aih-space-2);
   border-top: 1px solid var(--aih-color-border); padding-top: var(--aih-space-3); font-size: 0.875rem;
@@ -269,7 +299,7 @@
 .aih-type__count { font-size: 1.25rem; margin-right: 2px; }
 
 .aih-defined {
-  height: 100%; display: grid; gap: var(--aih-space-3); align-content: start; padding: var(--aih-space-4);
+  height: 100%; min-height: 188px; display: grid; gap: var(--aih-space-4); align-content: start; padding: var(--aih-space-6);
   background: var(--aih-color-surface); border: 1px solid var(--aih-color-border); border-radius: var(--aih-radius-lg);
 }
 .aih-defined--failing { border-color: color-mix(in srgb, var(--aih-color-danger) 45%, var(--aih-color-border)); }

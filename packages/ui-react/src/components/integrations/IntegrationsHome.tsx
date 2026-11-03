@@ -13,11 +13,13 @@ import {
   StatusPill,
   TypeMark,
 } from '../smtp/shared';
+import { SortableGrid, useCardLayout } from '../layout/SortableGrid';
 import { INTEGRATION_TYPES, type IntegrationType, type IntegrationTypeId } from './catalog';
 
 type Filter = 'all' | 'problems' | 'production' | 'test';
 
 const FILTERS: readonly Filter[] = ['all', 'problems', 'production', 'test'];
+const TYPE_IDS: readonly string[] = INTEGRATION_TYPES.map((type) => type.id);
 
 export function IntegrationsHome({ headerExtra }: { headerExtra?: ReactNode }) {
   const t = useTranslation();
@@ -28,6 +30,10 @@ export function IntegrationsHome({ headerExtra }: { headerExtra?: ReactNode }) {
   const [smtpAccounts, setSmtpAccounts] = useState<SmtpAccount[] | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [filter, setFilter] = useState<Filter>('all');
+  const [editing, setEditing] = useState(false);
+  const subject = session.me?.subject ?? null;
+  const typeLayout = useCardLayout('hub-types', subject, TYPE_IDS);
+  const accountLayout = useCardLayout('hub-defined', subject, (smtpAccounts ?? []).map((account) => account.id));
 
   const load = useCallback(async () => {
     if (!tenantId || !canReadEmail) {
@@ -76,21 +82,44 @@ export function IntegrationsHome({ headerExtra }: { headerExtra?: ReactNode }) {
               {problems} {t('hub.summary.problems')}
             </StatusPill>
           )}
+          {editing && !(typeLayout.isDefault && accountLayout.isDefault) && (
+            <button
+              type="button"
+              className="aih-button aih-button--ghost aih-button--sm"
+              onClick={() => {
+                typeLayout.reset();
+                accountLayout.reset();
+              }}
+            >
+              {t('layout.reset')}
+            </button>
+          )}
+          <button
+            type="button"
+            className={editing ? 'aih-button aih-button--primary aih-button--sm' : 'aih-button aih-button--ghost aih-button--sm'}
+            aria-pressed={editing}
+            onClick={() => setEditing((value) => !value)}
+          >
+            {editing ? t('layout.done') : t('layout.edit')}
+          </button>
         </div>
       </div>
+      {editing && <p className="aih-notice">{t('layout.editHint')}</p>}
 
       <section aria-labelledby="aih-hub-types" className="aih-section">
         <div className="aih-section__head">
           <h2 id="aih-hub-types">{t('hub.types.title')}</h2>
           <span className="aih-muted">{t('hub.types.hint')}</span>
         </div>
-        <ul className="aih-type-grid">
-          {INTEGRATION_TYPES.map((type) => (
-            <li key={type.id}>
-              <TypeTile type={type} count={counts[type.id] ?? 0} />
-            </li>
-          ))}
-        </ul>
+        <SortableGrid
+          state={typeLayout}
+          editing={editing}
+          items={INTEGRATION_TYPES.map((type) => ({
+            id: type.id,
+            title: t(type.nameKey),
+            node: <TypeTile type={type} count={counts[type.id] ?? 0} />,
+          }))}
+        />
       </section>
 
       <section aria-labelledby="aih-hub-defined" className="aih-section">
@@ -121,13 +150,15 @@ export function IntegrationsHome({ headerExtra }: { headerExtra?: ReactNode }) {
             {accounts.length === 0 ? t('hub.defined.empty') : t('hub.defined.emptyFiltered')}
           </p>
         ) : (
-          <ul className="aih-defined-grid">
-            {visible.map((account) => (
-              <li key={account.id}>
-                <EmailIntegrationCard account={account} />
-              </li>
-            ))}
-          </ul>
+          <SortableGrid
+            state={accountLayout}
+            editing={editing}
+            items={visible.map((account) => ({
+              id: account.id,
+              title: account.name,
+              node: <EmailIntegrationCard account={account} />,
+            }))}
+          />
         )}
       </section>
     </div>

@@ -78,6 +78,26 @@ describe('IntegrationsHome', () => {
     expect(screen.getByText('Destek Ekibi')).toBeInTheDocument();
   });
 
+  it('reorders integration types in edit mode and remembers the order', async () => {
+    window.localStorage.clear();
+    render_(ADMIN, [HEALTHY]);
+    await screen.findByText('Kurumsal Bildirim');
+    const types = screen.getByRole('region', { name: 'Yeni entegrasyon ekle' });
+    const names = () => within(types).getAllByText(/^(E-posta \(SMTP\)|Cache \(Redis \/ Valkey\))$/).map((n) => n.textContent);
+    expect(names()).toEqual(['E-posta (SMTP)', 'Cache (Redis / Valkey)']);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Düzeni değiştir' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Arkaya al: E-posta (SMTP)' }));
+
+    expect(names()).toEqual(['Cache (Redis / Valkey)', 'E-posta (SMTP)']);
+    expect(window.localStorage.getItem('aih.layout.hub-types.u1')).toContain('"cache"');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Varsayılana dön' }));
+    expect(names()).toEqual(['E-posta (SMTP)', 'Cache (Redis / Valkey)']);
+    fireEvent.click(screen.getByRole('button', { name: 'Bitti' }));
+    expect(screen.queryByRole('button', { name: 'Arkaya al: E-posta (SMTP)' })).not.toBeInTheDocument();
+  });
+
   it('hides the add action for viewers', async () => {
     render_(['smtp-account:read'], []);
     expect(await screen.findByText(/Henüz tanımlı entegrasyon yok/)).toBeInTheDocument();
