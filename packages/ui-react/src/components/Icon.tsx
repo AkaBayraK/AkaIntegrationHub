@@ -42,7 +42,8 @@ export type IconName =
   | 'users'
   | 'power'
   | 'flask'
-  | 'monitor';
+  | 'monitor'
+  | 'search';
 
 const PATHS: Record<IconName, readonly string[]> = {
   home: ['M4 4h6v6H4z', 'M14 4h6v6h-6z', 'M4 14h6v6H4z', 'M14 14h6v6h-6z'],
@@ -98,6 +99,7 @@ const PATHS: Record<IconName, readonly string[]> = {
   power: ['M12 3v9', 'M6.3 6.8a8 8 0 1 0 11.4 0'],
   flask: ['M9 3h6', 'M10 3v6l-5.5 9.5A1.6 1.6 0 0 0 5.9 21h12.2a1.6 1.6 0 0 0 1.4-2.5L14 9V3', 'M7.5 15h9'],
   monitor: ['M3 4.5h18v12H3z', 'M8 20.5h8', 'M12 16.5v4'],
+  search: ['M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14z', 'm20.5 20.5-4.5-4.5'],
 };
 
 export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {

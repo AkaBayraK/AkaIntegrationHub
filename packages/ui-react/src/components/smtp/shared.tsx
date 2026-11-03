@@ -3,7 +3,7 @@ import { HubApiError } from '../../api/client';
 import type { ProviderType, SmtpAccount } from '../../api/types';
 import { useTranslation } from '../../context';
 import type { MessageKey } from '../../i18n/messages';
-import { Icon } from '../Icon';
+import { Icon, type IconName } from '../Icon';
 import type { IntegrationTypeId } from '../integrations/catalog';
 
 export const SMTP_BASE_PATH = '/admin/email/providers';
@@ -79,10 +79,29 @@ export function StatusPill({ tone, children }: { tone: 'success' | 'danger' | 'w
   );
 }
 
-export function Kpi({ label, value, hint, tone }: { label: string; value: ReactNode; hint?: ReactNode; tone?: 'danger' | 'success' }) {
+export function Kpi({
+  label,
+  value,
+  hint,
+  tone,
+  icon,
+}: {
+  label: string;
+  value: ReactNode;
+  hint?: ReactNode;
+  tone?: 'danger' | 'success';
+  icon?: IconName;
+}) {
   return (
-    <div className="aih-kpi">
-      <span className="aih-kpi__label">{label}</span>
+    <div className={tone ? `aih-kpi aih-kpi--${tone}` : 'aih-kpi'}>
+      <span className="aih-kpi__label">
+        {icon && (
+          <span className="aih-kpi__icon" aria-hidden="true">
+            <Icon name={icon} size={18} />
+          </span>
+        )}
+        {label}
+      </span>
       <strong className={tone ? `aih-kpi__value aih-kpi__value--${tone}` : 'aih-kpi__value'}>{value}</strong>
       {hint && <span className={tone ? `aih-kpi__hint aih-kpi__hint--${tone}` : 'aih-kpi__hint'}>{hint}</span>}
     </div>

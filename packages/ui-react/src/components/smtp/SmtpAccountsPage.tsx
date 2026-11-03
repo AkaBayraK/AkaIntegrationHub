@@ -3,6 +3,7 @@ import type { AccountEnvironment, ConnectionTest, ProviderType, SmtpAccount } fr
 import { useAkaIntegration, useTranslation } from '../../context';
 import { useHubClient, useHubSession } from '../../session';
 import { ConsolePanel } from '../console/ConsolePanel';
+import { Icon } from '../Icon';
 import { ActionButton, DetailHero, InfoTiles, SectionTitle } from '../ui/Detail';
 import { ConnectionTestResult } from './ConnectionTestResult';
 import { SendTestEmailPanel } from './SendTestEmailPanel';
@@ -149,8 +150,11 @@ export function SmtpAccountsPage({ basePath = SMTP_BASE_PATH, homePath = '/' }: 
       {accounts && accounts.length > 0 && <SmtpKpis accounts={accounts} t={t} />}
 
       <div className="aih-filters" role="search">
-        <label className="aih-field aih-field--grow">
+        <label className="aih-field aih-field--grow aih-search">
           <span className="aih-visually-hidden">{t('smtp.search')}</span>
+          <span className="aih-search__icon" aria-hidden="true">
+            <Icon name="search" size={18} />
+          </span>
           <input
             className="aih-input"
             type="search"
@@ -251,10 +255,16 @@ function SmtpKpis({ accounts, t }: { accounts: SmtpAccount[]; t: Translate }) {
   const defaults = accounts.filter((a) => a.isDefault).map((a) => a.name);
   return (
     <div className="aih-kpis">
-      <Kpi label={t('smtp.kpi.active')} value={`${active} / ${accounts.length}`} />
-      <Kpi label={t('smtp.kpi.default')} value={defaults[0] ?? t('smtp.kpi.none')} hint={defaults.slice(1).join(', ') || undefined} />
-      <Kpi label={t('smtp.kpi.tested')} value={`${passed} / ${tested.length}`} />
+      <Kpi icon="power" label={t('smtp.kpi.active')} value={`${active} / ${accounts.length}`} />
       <Kpi
+        icon="star"
+        label={t('smtp.kpi.default')}
+        value={defaults[0] ?? t('smtp.kpi.none')}
+        hint={defaults.slice(1).join(', ') || undefined}
+      />
+      <Kpi icon="activity" label={t('smtp.kpi.tested')} value={`${passed} / ${tested.length}`} />
+      <Kpi
+        icon={failing.length ? 'x' : 'check'}
         label={t('smtp.kpi.attention')}
         value={failing.length}
         hint={failing.length ? failing.map((a) => a.name).join(', ') : t('smtp.kpi.allGood')}

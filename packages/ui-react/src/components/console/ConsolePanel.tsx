@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from '../../context';
+import { Icon } from '../Icon';
 
 export function safeConsoleUrl(value: string | null | undefined): URL | null {
   if (!value) return null;
@@ -20,9 +21,14 @@ export function ConsolePanel({ url, title }: { url: string | null; title: string
   return (
     <div className="aih-console">
       <div className="aih-console__head">
-        <div>
-          <h3>{t('console.title')}</h3>
-          <code className="aih-muted">{safe.host}</code>
+        <div className="aih-console__title">
+          <span className="aih-section-title__icon" aria-hidden="true">
+            <Icon name="monitor" size={16} />
+          </span>
+          <div>
+            <h3>{t('console.title')}</h3>
+            <code className="aih-muted">{safe.host}</code>
+          </div>
         </div>
         <div className="aih-row aih-row--wrap">
           <button

@@ -59,6 +59,8 @@ Bağlantı adımları: DNS `globe`, TCP/bağlantı `plug`, SMTP karşılama `mes
 veritabanı seçimi `database`, PING `activity`, sunucu bilgisi `info`. Adım ikonunun köşesinde ✓ (yeşil) ya da
 ✕ (kırmızı) işareti ve süresi bulunur; hata kodu adımın altında yazılır.
 
+KPI kartları ve arama kutuları da ikonludur (`Kpi icon=…`, `aih-search`); yönetim arayüzü paneli `monitor` ikonunu taşır.
+
 Entegrasyon türleri `type-email`, `type-cache`, `type-queue`, `type-sms`, `type-webhook`, `type-push`,
 `type-whatsapp`, `type-storage`; her türün rengi `styles.css` içindeki `--aih-mark-color` ile tanımlıdır.
 
