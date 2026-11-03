@@ -12,6 +12,7 @@ from aih_api.identity.deps import CurrentPrincipal, TenantScope, require
 from aih_api.identity.principal import Permission
 from aih_api.providers.cache import service
 from aih_api.providers.cache.capabilities import CACHE_CAPABILITIES
+from aih_api.providers.cache.license import license_out, license_status
 from aih_api.providers.cache.models import CacheAccount
 from aih_api.providers.cache.schemas import (
     CacheAccountCreate,
@@ -49,8 +50,16 @@ async def cache_context(request: Request, scope: TenantScope) -> AsyncIterator[s
 
 
 def _out(account: CacheAccount, scope: TenantScope) -> CacheAccountOut:
-    fields = {name: getattr(account, name) for name in CacheAccountOut.model_fields if name != "has_secret"}
-    out = CacheAccountOut.model_validate({**fields, "has_secret": account.secret_ref is not None})
+    computed = {"has_secret", "license", "license_status"}
+    fields = {name: getattr(account, name) for name in CacheAccountOut.model_fields if name not in computed}
+    out = CacheAccountOut.model_validate(
+        {
+            **fields,
+            "has_secret": account.secret_ref is not None,
+            "license": license_out(account),
+            "license_status": license_status(account),
+        }
+    )
     if not scope.principal.can(Permission.CACHE_ACCOUNT_WRITE):
         out = out.model_copy(update={"host": mask(out.host) or "", "username": mask(out.username)})
     return out

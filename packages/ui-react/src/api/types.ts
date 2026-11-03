@@ -68,6 +68,27 @@ export interface SmtpAccount extends SmtpAccountInput {
 
 export type CacheProviderType = 'valkey' | 'redis';
 export type CacheAuthMode = 'none' | 'password' | 'acl';
+export type CacheLicenseType = 'rsal-2.0' | 'sspl-1.0' | 'agpl-3.0' | 'redis-enterprise' | 'redis-cloud';
+export type CacheLicenseStatus = 'not_required' | 'valid' | 'expiring' | 'expired';
+
+export interface CacheLicenseInput {
+  type: CacheLicenseType;
+  holder: string | null;
+  reference: string | null;
+  expiresOn: string | null;
+  key?: string | null;
+  acknowledged: boolean;
+}
+
+export interface CacheLicense {
+  type: CacheLicenseType;
+  holder: string | null;
+  reference: string | null;
+  expiresOn: string | null;
+  hasKey: boolean;
+  acknowledgedAt: string | null;
+  acknowledgedBy: string | null;
+}
 
 export interface CacheCapability {
   type: CacheProviderType;
@@ -89,6 +110,7 @@ export interface CacheAccountInput {
   enabled: boolean;
   timeoutSeconds: number;
   consoleUrl: string | null;
+  license?: CacheLicenseInput | null;
 }
 
 export interface CacheAccountCreate extends CacheAccountInput {
@@ -97,7 +119,7 @@ export interface CacheAccountCreate extends CacheAccountInput {
   makeDefault?: boolean;
 }
 
-export interface CacheAccount extends CacheAccountInput {
+export interface CacheAccount extends Omit<CacheAccountInput, 'license'> {
   id: string;
   tenantId: string;
   projectId: string | null;
@@ -107,6 +129,8 @@ export interface CacheAccount extends CacheAccountInput {
   lastTestAt: string | null;
   lastTestOutcome: 'passed' | 'failed' | null;
   serverVersion: string | null;
+  license: CacheLicense | null;
+  licenseStatus: CacheLicenseStatus;
   version: number;
   createdAt: string;
   updatedAt: string;

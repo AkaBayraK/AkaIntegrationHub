@@ -1,6 +1,12 @@
 # Changelog
 
 ## [Unreleased]
+### Cache — Redis lisans beyanı
+- Redis hesaplarında lisans zorunlu: tür (AGPLv3, RSALv2, SSPLv1, Redis Enterprise, Redis Cloud), sahip, sözleşme no,
+  bitiş tarihi, ticari lisans anahtarı (şifreli) ve sahiplik onayı (audit). Valkey hesapları lisans taşımaz.
+- Lisans durumu (geçerli / bitmek üzere / süresi doldu) detayda ve rozetlerde. Migration `202611031100`.
+- Plan: `docs/plans/PROJECT_CACHE_SELECTION_PLAN.md` (proje bazlı cache seçimi ve ayar dağıtımı).
+
 ### Arayüz — detay ekranları ve tasarım standardı
 - SMTP ve Cache detayları: başlık kartı (ikon, durum, eylemler), ikonlu bilgi kutuları, ikonlu bağlantı adımları,
   sunucu özeti kartları. Sol şeritte üzerine gelince ad görünür; üst menüye Cache eklendi.

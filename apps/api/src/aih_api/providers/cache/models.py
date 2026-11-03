@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, func
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from aih_api.db import Base
@@ -35,6 +35,13 @@ class CacheAccount(Base):
     last_test_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     last_test_outcome: Mapped[str | None] = mapped_column(String(16))
     server_version: Mapped[str | None] = mapped_column(String(64))
+    license_type: Mapped[str | None] = mapped_column(String(32))
+    license_holder: Mapped[str | None] = mapped_column(String(200))
+    license_reference: Mapped[str | None] = mapped_column(String(120))
+    license_expires_on: Mapped[date | None] = mapped_column(Date)
+    license_key_ref: Mapped[uuid.UUID | None]
+    license_acknowledged_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    license_acknowledged_by: Mapped[str | None] = mapped_column(String(255))
     version: Mapped[int] = mapped_column(Integer, default=1)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     created_by: Mapped[str] = mapped_column(String(255))

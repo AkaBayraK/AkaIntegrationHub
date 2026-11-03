@@ -16,6 +16,7 @@ from aih_api.errors import ApiError
 from aih_api.identity.principal import Principal
 from aih_api.providers.cache.capabilities import CacheAuthMode, CacheEnvironment
 from aih_api.providers.cache.client import CacheError, CacheTarget, cache_session, server_info
+from aih_api.providers.cache.license import apply_license
 from aih_api.providers.cache.models import CacheAccount
 from aih_api.providers.cache.schemas import CacheAccountCreate, CacheAccountUpdate
 from aih_api.providers.common import Step, StepRecorder, decode_cursor, encode_cursor
@@ -95,7 +96,7 @@ async def create(ctx: CacheContext, payload: CacheAccountCreate) -> CacheAccount
     account = CacheAccount(
         id=uuid.uuid4(),
         tenant_id=ctx.tenant_id,
-        **payload.model_dump(exclude={"password", "make_default"}),
+        **payload.model_dump(exclude={"password", "make_default", "license"}),
         is_default=False,
         created_by=ctx.principal.subject,
         updated_by=ctx.principal.subject,
@@ -105,11 +106,14 @@ async def create(ctx: CacheContext, payload: CacheAccountCreate) -> CacheAccount
     if await _name_taken(ctx, account.name):
         raise ApiError(409, "AIH-CACHE-005", "Bu adla bir cache hesabı zaten var", "name")
     await _store_password(ctx, account, password)
+    await apply_license(ctx.session, ctx.secrets, account, payload.license, actor=ctx.principal.subject)
     ctx.session.add(account)
     await ctx.session.flush()
     if payload.make_default:
         await _make_default(ctx, account)
-    await _audit(ctx, "create", account, name=account.name, providerType=account.provider_type)
+    await _audit(
+        ctx, "create", account, name=account.name, providerType=account.provider_type, licenseType=account.license_type
+    )
     return account
 
 
@@ -154,7 +158,7 @@ async def update_account(
 ) -> CacheAccount:
     account = await get(ctx, account_id)
     _check_version(account, expected_version)
-    changes = payload.model_dump(exclude_unset=True, exclude={"password"})
+    changes = payload.model_dump(exclude_unset=True, exclude={"password", "license"})
     for key, value in changes.items():
         setattr(account, key, value.value if hasattr(value, "value") else value)
     password = payload.password.get_secret_value() if payload.password else None
@@ -164,10 +168,14 @@ async def update_account(
     if "name" in changes and await _name_taken(ctx, account.name, exclude=account.id):
         raise ApiError(409, "AIH-CACHE-005", "Bu adla bir cache hesabı zaten var", "name")
     await _store_password(ctx, account, password)
+    license_changed = await apply_license(
+        ctx.session, ctx.secrets, account, payload.license, actor=ctx.principal.subject
+    )
     account.updated_by = ctx.principal.subject
     account.updated_at = datetime.now(UTC)
     await _flush(ctx)
-    await _audit(ctx, "update", account, fields=sorted([*changes, *(["password"] if password else [])]))
+    secret_fields = [*(["password"] if password else []), *(["license"] if license_changed else [])]
+    await _audit(ctx, "update", account, fields=sorted([*changes, *secret_fields]), licenseType=account.license_type)
     return account
 
 

@@ -2,12 +2,18 @@ from __future__ import annotations
 
 import re
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from typing import Annotated
 
 from pydantic import AfterValidator, Field, SecretStr, field_validator
 
-from aih_api.providers.cache.capabilities import CacheAuthMode, CacheEnvironment, CacheProviderType
+from aih_api.providers.cache.capabilities import (
+    CacheAuthMode,
+    CacheEnvironment,
+    CacheLicenseStatus,
+    CacheLicenseType,
+    CacheProviderType,
+)
 from aih_api.providers.common import ApiModel, ConsoleUrl, strip_single_line
 
 MAX_DATABASE_INDEX = 15
@@ -30,6 +36,28 @@ class CacheCapabilityOut(ApiModel):
     license_note: str
 
 
+class CacheLicenseIn(ApiModel):
+    type: CacheLicenseType
+    holder: str | None = Field(default=None, max_length=200)
+    reference: str | None = Field(default=None, max_length=120)
+    expires_on: date | None = None
+    # Yalnız ticari lisanslarda; yalnız yazılır, asla okunmaz.
+    key: SecretStr | None = Field(default=None, max_length=4096)
+    acknowledged: bool = False
+
+    _strip = field_validator("holder", "reference")(strip_single_line)
+
+
+class CacheLicenseOut(ApiModel):
+    type: CacheLicenseType
+    holder: str | None
+    reference: str | None
+    expires_on: date | None
+    has_key: bool
+    acknowledged_at: datetime | None
+    acknowledged_by: str | None
+
+
 class CacheAccountCreate(ApiModel):
     project_id: uuid.UUID | None = None
     name: str = Field(min_length=1, max_length=120)
@@ -48,6 +76,7 @@ class CacheAccountCreate(ApiModel):
     make_default: bool = False
     timeout_seconds: int = Field(default=5, ge=1, le=60)
     console_url: ConsoleUrl | None = None
+    license: CacheLicenseIn | None = None
 
     _strip = field_validator("name", "host", "username")(strip_single_line)
 
@@ -66,6 +95,7 @@ class CacheAccountUpdate(ApiModel):
     enabled: bool | None = None
     timeout_seconds: int | None = Field(default=None, ge=1, le=60)
     console_url: ConsoleUrl | None = None
+    license: CacheLicenseIn | None = None
 
     _strip = field_validator("name", "host", "username")(strip_single_line)
 
@@ -92,6 +122,8 @@ class CacheAccountOut(ApiModel):
     last_test_at: datetime | None
     last_test_outcome: str | None
     server_version: str | None
+    license: CacheLicenseOut | None
+    license_status: CacheLicenseStatus
     version: int
     created_at: datetime
     updated_at: datetime

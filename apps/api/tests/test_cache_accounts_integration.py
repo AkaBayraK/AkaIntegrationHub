@@ -152,3 +152,74 @@ async def test_update_requires_current_version_and_single_default(env: Env, valk
     assert made.json()["isDefault"] is True
     refreshed = (await env.api.get(f"{_base(env)}/{first['id']}", headers=env.auth())).json()
     assert refreshed["isDefault"] is False
+
+
+def redis_payload(valkey: Any, name: str, license_: dict[str, Any] | None, **overrides: Any) -> dict[str, Any]:
+    payload = valkey_payload(valkey, name, providerType="redis", **overrides)
+    if license_ is not None:
+        payload["license"] = license_
+    return payload
+
+
+@pytest.mark.parametrize(
+    ("license_", "code"),
+    [
+        (None, "AIH-CACHE-007"),
+        ({"type": "agpl-3.0"}, "AIH-CACHE-008"),
+        ({"type": "redis-enterprise", "acknowledged": True, "key": "k"}, "AIH-CACHE-009"),
+        ({"type": "agpl-3.0", "acknowledged": True, "key": "k"}, "AIH-CACHE-010"),
+        ({"type": "redis-cloud", "holder": "Aka", "acknowledged": True}, "AIH-CACHE-011"),
+    ],
+)
+async def test_redis_requires_a_declared_license(
+    env: Env, valkey: Any, license_: dict[str, Any] | None, code: str
+) -> None:
+    payload = redis_payload(valkey, f"redis-{uuid.uuid4().hex[:8]}", license_)
+    response = await env.api.post(_base(env), json=payload, headers=env.auth())
+    assert response.status_code == 422, response.text
+    assert response.json()["code"] == code
+
+
+async def test_commercial_redis_license_key_is_encrypted_and_tracked(env: Env, valkey: Any) -> None:
+    license_ = {
+        "type": "redis-enterprise",
+        "holder": "Aka Yazılım A.Ş.",
+        "reference": "SUB-2026-001",
+        "expiresOn": "2099-12-31",
+        "key": "enterprise-license-key-test-only",
+        "acknowledged": True,
+    }
+    account = await _create(env, redis_payload(valkey, "Kurumsal Redis", license_))
+
+    assert account["licenseStatus"] == "valid"
+    assert account["license"]["hasKey"] is True
+    assert account["license"]["acknowledgedBy"] == "user-1"
+    assert "enterprise-license-key" not in str(account)
+    async with env.infra.engine.connect() as conn:
+        ciphertexts = (await conn.execute(text("SELECT ciphertext FROM provider.secrets"))).scalars().all()
+        audit = (
+            (
+                await conn.execute(
+                    text("SELECT details::text FROM audit.audit_events WHERE resource_id = :id"), {"id": account["id"]}
+                )
+            )
+            .scalars()
+            .all()
+        )
+    assert all(b"enterprise-license-key" not in bytes(c) for c in ciphertexts)
+    assert "redis-enterprise" in " ".join(audit)
+
+    expired = {**license_, "key": None, "expiresOn": "2020-01-01"}
+    updated = await env.api.patch(
+        f"{_base(env)}/{account['id']}", json={"license": expired}, headers={**env.auth(), "If-Match": 'W/"1"'}
+    )
+    assert updated.status_code == 200, updated.text
+    assert updated.json()["licenseStatus"] == "expired"
+    assert updated.json()["license"]["hasKey"] is True
+
+
+async def test_valkey_never_carries_a_license(env: Env, valkey: Any) -> None:
+    payload = valkey_payload(valkey, "Lisanssız Valkey", license={"type": "agpl-3.0", "acknowledged": True})
+    account = await _create(env, payload)
+    assert account["license"] is None
+    assert account["licenseStatus"] == "not_required"

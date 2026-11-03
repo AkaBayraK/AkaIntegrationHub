@@ -1,16 +1,48 @@
 import { useState, type FormEvent } from 'react';
-import type { CacheAccount, CacheAccountInput, CacheAuthMode, CacheProviderType } from '../../api/types';
+import type {
+  CacheAccount,
+  CacheAccountInput,
+  CacheAuthMode,
+  CacheLicenseInput,
+  CacheLicenseType,
+  CacheProviderType,
+} from '../../api/types';
 import { useTranslation } from '../../context';
 import type { MessageKey } from '../../i18n/messages';
 import { useHubClient } from '../../session';
 import { safeConsoleUrl } from '../console/ConsolePanel';
+import { Icon } from '../Icon';
 import { ErrorNotice, Field } from '../smtp/shared';
 
-type FormState = CacheAccountInput & { providerType: CacheProviderType; password: string; makeDefault: boolean };
-type Errors = Partial<Record<keyof FormState, MessageKey>>;
+interface LicenseState {
+  type: CacheLicenseType;
+  holder: string;
+  reference: string;
+  expiresOn: string;
+  key: string;
+  acknowledged: boolean;
+}
+type FormState = Omit<CacheAccountInput, 'license'> & {
+  providerType: CacheProviderType;
+  password: string;
+  makeDefault: boolean;
+  license: LicenseState;
+};
+type Errors = Partial<Record<keyof FormState | 'licenseHolder' | 'licenseKey' | 'licenseAck', MessageKey>>;
 
 const KEY_PREFIX = /^[A-Za-z0-9._:-]{1,120}$/;
 const MAX_DATABASE_INDEX = 15;
+export const LICENSE_TYPES: readonly CacheLicenseType[] = ['agpl-3.0', 'rsal-2.0', 'sspl-1.0', 'redis-enterprise', 'redis-cloud'];
+const COMMERCIAL: ReadonlySet<CacheLicenseType> = new Set(['redis-enterprise', 'redis-cloud']);
+
+const EMPTY_LICENSE: LicenseState = {
+  type: 'agpl-3.0',
+  holder: '',
+  reference: '',
+  expiresOn: '',
+  key: '',
+  acknowledged: false,
+};
 
 const EMPTY: FormState = {
   name: '',
@@ -28,9 +60,13 @@ const EMPTY: FormState = {
   makeDefault: false,
   timeoutSeconds: 5,
   consoleUrl: '',
+  license: EMPTY_LICENSE,
 };
 
-export function validateCacheForm(state: FormState, opts: { creating: boolean; hasSecret: boolean }): Errors {
+export function validateCacheForm(
+  state: FormState,
+  opts: { creating: boolean; hasSecret: boolean; hasLicenseKey?: boolean },
+): Errors {
   const errors: Errors = {};
   if (!state.name.trim()) errors.name = 'smtp.form.error.required';
   if (!state.host.trim()) errors.host = 'smtp.form.error.required';
@@ -45,11 +81,24 @@ export function validateCacheForm(state: FormState, opts: { creating: boolean; h
     errors.password = 'smtp.form.error.required';
   }
   if (state.consoleUrl?.trim() && !safeConsoleUrl(state.consoleUrl.trim())) errors.consoleUrl = 'console.error.url';
+  if (state.providerType === 'redis') Object.assign(errors, validateLicense(state.license, Boolean(opts.hasLicenseKey)));
+  return errors;
+}
+
+type LicenseErrors = Partial<Record<'licenseHolder' | 'licenseKey' | 'licenseAck', MessageKey>>;
+
+function validateLicense(license: LicenseState, hasStoredKey: boolean): LicenseErrors {
+  const errors: LicenseErrors = {};
+  const commercial = COMMERCIAL.has(license.type);
+  if (commercial && !license.holder.trim()) errors.licenseHolder = 'smtp.form.error.required';
+  if (commercial && !license.key && !hasStoredKey) errors.licenseKey = 'smtp.form.error.required';
+  if (!license.acknowledged) errors.licenseAck = 'license.error.ack';
   return errors;
 }
 
 function toState(account: CacheAccount | null): FormState {
   if (!account) return EMPTY;
+  const license = account.license;
   return {
     ...EMPTY,
     ...account,
@@ -58,6 +107,29 @@ function toState(account: CacheAccount | null): FormState {
     consoleUrl: account.consoleUrl ?? '',
     password: '',
     makeDefault: account.isDefault,
+    license: license
+      ? {
+          type: license.type,
+          holder: license.holder ?? '',
+          reference: license.reference ?? '',
+          expiresOn: license.expiresOn ?? '',
+          key: '',
+          acknowledged: false,
+        }
+      : EMPTY_LICENSE,
+  };
+}
+
+function toLicense(state: FormState): CacheLicenseInput | null {
+  if (state.providerType !== 'redis') return null;
+  const { license } = state;
+  return {
+    type: license.type,
+    holder: license.holder.trim() || null,
+    reference: license.reference.trim() || null,
+    expiresOn: license.expiresOn || null,
+    key: COMMERCIAL.has(license.type) && license.key ? license.key : null,
+    acknowledged: license.acknowledged,
   };
 }
 
@@ -75,6 +147,7 @@ function toInput(state: FormState): CacheAccountInput {
     enabled: state.enabled,
     timeoutSeconds: state.timeoutSeconds,
     consoleUrl: state.consoleUrl?.trim() || null,
+    license: toLicense(state),
   };
 }
 
@@ -121,7 +194,11 @@ export function CacheAccountForm({
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    const found = validateCacheForm(state, { creating, hasSecret: Boolean(account?.hasSecret) });
+    const found = validateCacheForm(state, {
+      creating,
+      hasSecret: Boolean(account?.hasSecret),
+      hasLicenseKey: Boolean(account?.license?.hasKey),
+    });
     setErrors(found);
     setSubmitError(null);
     if (Object.keys(found).length > 0) return;
@@ -175,7 +252,14 @@ export function CacheAccountForm({
           </select>
         </Field>
       </div>
-      {state.providerType === 'redis' && <p className="aih-notice">{t('cache.form.redisNote')}</p>}
+      {state.providerType === 'redis' && (
+        <LicenseFieldset
+          license={state.license}
+          errors={errors}
+          storedKey={Boolean(account?.license?.hasKey)}
+          onChange={(license) => set('license', license)}
+        />
+      )}
       <div className="aih-grid-3">
         <Field id="aih-cache-host" label={t('smtp.form.host')} error={err('host')}>
           <input id="aih-cache-host" className="aih-input" value={state.host} onChange={(e) => set('host', e.target.value)} />
@@ -306,5 +390,104 @@ export function CacheAccountForm({
         </button>
       </div>
     </form>
+  );
+}
+
+function LicenseFieldset({
+  license,
+  errors,
+  storedKey,
+  onChange,
+}: {
+  license: LicenseState;
+  errors: Errors;
+  storedKey: boolean;
+  onChange: (license: LicenseState) => void;
+}) {
+  const t = useTranslation();
+  const commercial = COMMERCIAL.has(license.type);
+  const update = <K extends keyof LicenseState>(key: K, value: LicenseState[K]) => onChange({ ...license, [key]: value });
+  const err = (key: keyof Errors) => (errors[key] ? t(errors[key]) : undefined);
+  return (
+    <fieldset className="aih-license">
+      <legend>
+        <Icon name="shield" size={16} /> {t('license.title')}
+      </legend>
+      <p className="aih-notice">{t('cache.form.redisNote')}</p>
+      <div className="aih-grid-3">
+        <Field id="aih-license-type" label={t('license.type')} help={t(`license.typeHint.${license.type}` as const)}>
+          <select
+            id="aih-license-type"
+            className="aih-select"
+            value={license.type}
+            onChange={(e) => update('type', e.target.value as CacheLicenseType)}
+          >
+            {LICENSE_TYPES.map((type) => (
+              <option key={type} value={type}>
+                {t(`license.type.${type}` as const)}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field id="aih-license-holder" label={t('license.holder')} error={err('licenseHolder')}>
+          <input
+            id="aih-license-holder"
+            className="aih-input"
+            maxLength={200}
+            value={license.holder}
+            onChange={(e) => update('holder', e.target.value)}
+          />
+        </Field>
+        <Field id="aih-license-reference" label={t('license.reference')}>
+          <input
+            id="aih-license-reference"
+            className="aih-input"
+            maxLength={120}
+            value={license.reference}
+            onChange={(e) => update('reference', e.target.value)}
+          />
+        </Field>
+        <Field id="aih-license-expires" label={t('license.expiresOn')}>
+          <input
+            id="aih-license-expires"
+            className="aih-input"
+            type="date"
+            value={license.expiresOn}
+            onChange={(e) => update('expiresOn', e.target.value)}
+          />
+        </Field>
+        {commercial && (
+          <Field
+            id="aih-license-key"
+            label={t('license.key')}
+            error={err('licenseKey')}
+            help={storedKey ? t('license.keyKeep') : undefined}
+          >
+            <input
+              id="aih-license-key"
+              className="aih-input"
+              type="password"
+              autoComplete="off"
+              value={license.key}
+              onChange={(e) => update('key', e.target.value)}
+            />
+          </Field>
+        )}
+      </div>
+      <label className="aih-check">
+        <input
+          type="checkbox"
+          checked={license.acknowledged}
+          aria-invalid={Boolean(errors.licenseAck)}
+          onChange={(e) => update('acknowledged', e.target.checked)}
+        />
+        <span>{t('license.acknowledge')}</span>
+      </label>
+      {errors.licenseAck && (
+        <small className="aih-field__error" role="alert">
+          {t(errors.licenseAck)}
+        </small>
+      )}
+    </fieldset>
   );
 }

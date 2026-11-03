@@ -189,6 +189,11 @@ function CacheDetail({
           <>
             <StatusPill tone={HEALTH_TONES[health]}>{t(HEALTH_LABELS[health])}</StatusPill>
             {account.isDefault && <Badge tone="accent">{t('smtp.default')}</Badge>}
+            {account.licenseStatus !== 'not_required' && (
+              <StatusPill tone={LICENSE_TONES[account.licenseStatus]}>
+                {t(`license.status.${account.licenseStatus}` as const)}
+              </StatusPill>
+            )}
           </>
         }
         actions={
@@ -233,9 +238,56 @@ function CacheDetail({
           },
         ]}
       />
+      {account.license && <LicenseSection account={account} t={t} />}
       {result && <CacheTestResult result={result} t={t} />}
       <ConsolePanel url={account.consoleUrl} title={account.name} />
     </section>
+  );
+}
+
+const LICENSE_TONES = {
+  not_required: 'neutral',
+  valid: 'success',
+  expiring: 'warning',
+  expired: 'danger',
+} as const satisfies Record<CacheAccount['licenseStatus'], 'neutral' | 'success' | 'warning' | 'danger'>;
+
+function LicenseSection({ account, t }: { account: CacheAccount; t: Translate }) {
+  const { locale } = useAkaIntegration();
+  const license = account.license;
+  if (!license) return null;
+  const tone = LICENSE_TONES[account.licenseStatus];
+  return (
+    <div className="aih-detail__section">
+      <SectionTitle
+        icon="shield"
+        aside={<StatusPill tone={tone}>{t(`license.status.${account.licenseStatus}` as const)}</StatusPill>}
+      >
+        {t('license.title')}
+      </SectionTitle>
+      <InfoTiles
+        label={t('license.title')}
+        items={[
+          { icon: 'shield', label: t('license.type'), value: t(`license.type.${license.type}` as const) },
+          { icon: 'user', label: t('license.holder'), value: license.holder ?? '—' },
+          { icon: 'tag', label: t('license.reference'), value: license.reference ?? '—', mono: true },
+          {
+            icon: 'clock',
+            label: t('license.expiresOn'),
+            value: license.expiresOn
+              ? new Intl.DateTimeFormat(locale.locale === 'tr' ? 'tr-TR' : 'en-GB').format(new Date(license.expiresOn))
+              : t('license.noExpiry'),
+            tone: tone === 'neutral' ? undefined : tone,
+          },
+          { icon: 'key', label: t('license.key'), value: t(license.hasKey ? 'license.keyStored' : 'license.noKey') },
+          {
+            icon: 'check',
+            label: t('license.acknowledgedBy'),
+            value: `${license.acknowledgedBy ?? '—'} · ${formatDate(license.acknowledgedAt, locale.locale) ?? ''}`,
+          },
+        ]}
+      />
+    </div>
   );
 }
 

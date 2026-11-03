@@ -12,7 +12,7 @@ Repo, CI/CD, local Docker (PostgreSQL, Valkey, RabbitMQ), backend/web skeleton, 
 PHASE-01 backend iskeletinin Python/FastAPI ile yeniden yazılması; frontend, altyapı ve iş kuralları değişmez. Ayrıntılar: `docs/adr/0013-python-backend.md`, `docs/plans/PYTHON_MIGRATION_PLAN.md`. Kabul: PHASE-01 backend kabul kriterleri Python ile sağlanır, admin web değişmeden çalışır.
 
 ## PHASE-02 — Identity, Tenant & Project
-PlatformAdmin, TenantAdmin, ProjectAdmin, Operator, Viewer, ServiceAccount; tenant/project, OIDC/Keycloak, API key, RBAC, project scopes, invitation, tenant isolation, audit. Kabul: cross-tenant negatif testler, anahtar rotasyonu.
+PlatformAdmin, TenantAdmin, ProjectAdmin, Operator, Viewer, ServiceAccount; tenant/project, OIDC/Keycloak, API key, RBAC, project scopes, invitation, tenant isolation, audit. Proje bazlı cache seçimi ve servis kimliğiyle ayar dağıtımı: `docs/plans/PROJECT_CACHE_SELECTION_PLAN.md`. Kabul: cross-tenant negatif testler, anahtar rotasyonu.
 
 ## PHASE-03 — Provider Registry & Adapter SDK
 Provider türleri/capabilities, credentials secret refs, account configuration, adapter SPI, connection tests, enable/disable, priorities, health, sandbox. SMTP tenant/proje bazlı hesaplar, gerçek provider credential secret refs, bağlantı testi, varsayılan/yedek hesap ve OAuth2/SMTP AUTH yetenekleri `docs/design/SMTP_MAILPIT_DESIGN.md` kapsamında. Kabul: mock provider ekleme ve yeni hesap UI/API üzerinden tanımlama.

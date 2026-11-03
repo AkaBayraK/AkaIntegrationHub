@@ -525,3 +525,11 @@
   .aih-detail { padding: var(--aih-space-4); }
   .aih-hero__actions { width: 100%; }
 }
+
+/* Redis lisans bölümü */
+.aih-license {
+  display: grid; gap: var(--aih-space-3); margin: 0; padding: var(--aih-space-4);
+  border: 1px solid color-mix(in srgb, #d97706 35%, var(--aih-color-border)); border-radius: var(--aih-radius-md);
+  background: color-mix(in srgb, #d97706 5%, var(--aih-color-surface));
+}
+.aih-license legend { display: inline-flex; align-items: center; gap: var(--aih-space-2); padding: 0 var(--aih-space-2); font-weight: 700; }

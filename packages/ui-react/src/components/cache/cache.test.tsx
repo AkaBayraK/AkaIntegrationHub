@@ -14,6 +14,7 @@ const ACCOUNT: CacheAccount = {
   port: 26379, tlsEnabled: false, authMode: 'none', username: null, hasSecret: false, databaseIndex: 0,
   keyPrefix: 'buildingflow:', environment: 'test', enabled: true, isDefault: true, timeoutSeconds: 5,
   consoleUrl: 'http://localhost:5540', lastTestAt: null, lastTestOutcome: null, serverVersion: null, version: 1,
+  license: null, licenseStatus: 'not_required',
   createdAt: '2026-11-03T10:00:00Z', updatedAt: '2026-11-03T10:00:00Z',
 };
 
@@ -26,14 +27,14 @@ const TEST_RESULT = {
   },
 };
 
-function renderPage(permissions: string[]) {
+function renderPage(permissions: string[], account: CacheAccount = ACCOUNT) {
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = new URL(String(input));
     const body = url.pathname === '/v1/me'
       ? { subject: 'u1', displayName: null, email: null, tenant: { id: TENANT, slug: 'bf', name: 'BuildingFlow' }, roles: [], permissions }
       : init?.method === 'POST'
         ? TEST_RESULT
-        : { items: [ACCOUNT], nextCursor: null };
+        : { items: [account], nextCursor: null };
     return new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
   });
   vi.stubGlobal('fetch', fetchMock);
@@ -70,6 +71,22 @@ describe('CacheAccountsPage', () => {
     );
   });
 
+  it('shows the declared Redis license and its status', async () => {
+    renderPage(['cache-account:read'], {
+      ...ACCOUNT,
+      providerType: 'redis',
+      licenseStatus: 'expiring',
+      license: {
+        type: 'redis-enterprise', holder: 'Aka Yazılım', reference: 'SUB-1', expiresOn: '2026-11-20', hasKey: true,
+        acknowledgedAt: '2026-11-03T10:00:00Z', acknowledgedBy: 'ayse',
+      },
+    });
+    const section = (await screen.findByLabelText('Redis lisansı'));
+    expect(within(section).getByText('Redis Enterprise (ticari)')).toBeInTheDocument();
+    expect(within(section).getByText('Şifreli olarak kayıtlı')).toBeInTheDocument();
+    expect(screen.getAllByText('Lisans bitmek üzere').length).toBeGreaterThan(0);
+  });
+
   it('opens the management console in a new tab or embeds it on demand', async () => {
     renderPage(['cache-account:read']);
     const open = await screen.findByRole('link', { name: /Yeni sekmede aç/ });
@@ -88,6 +105,7 @@ describe('cache form rules', () => {
     name: 'Valkey', providerType: 'valkey' as const, host: 'localhost', port: 6379, tlsEnabled: false,
     authMode: 'none' as const, username: '', password: '', databaseIndex: 0, keyPrefix: '', environment: 'test' as const,
     enabled: true, makeDefault: false, timeoutSeconds: 5, consoleUrl: '',
+    license: { type: 'agpl-3.0' as const, holder: '', reference: '', expiresOn: '', key: '', acknowledged: false },
   };
 
   it('accepts a minimal test account and enforces auth, database and prefix rules', () => {
@@ -104,6 +122,21 @@ describe('cache form rules', () => {
       .toMatchObject({ databaseIndex: 'cache.form.error.database', keyPrefix: 'cache.form.error.prefix' });
     expect(validateCacheForm({ ...base, consoleUrl: 'javascript:alert(1)' }, { creating: true, hasSecret: false }).consoleUrl)
       .toBe('console.error.url');
+  });
+
+  it('requires a declared license for Redis and a key for commercial licenses', () => {
+    const redis = { ...base, providerType: 'redis' as const };
+    expect(validateCacheForm(redis, { creating: true, hasSecret: false }).licenseAck).toBe('license.error.ack');
+    expect(
+      validateCacheForm({ ...redis, license: { ...redis.license, acknowledged: true } }, { creating: true, hasSecret: false }),
+    ).toEqual({});
+    const enterprise = { ...redis, license: { ...redis.license, type: 'redis-enterprise' as const, acknowledged: true } };
+    expect(validateCacheForm(enterprise, { creating: true, hasSecret: false })).toMatchObject({
+      licenseHolder: 'smtp.form.error.required',
+      licenseKey: 'smtp.form.error.required',
+    });
+    const stored = { ...enterprise, license: { ...enterprise.license, holder: 'Aka' } };
+    expect(validateCacheForm(stored, { creating: false, hasSecret: false, hasLicenseKey: true })).toEqual({});
   });
 
   it('only allows http(s) console addresses', () => {

@@ -17,6 +17,24 @@ class CacheAuthMode(StrEnum):
     ACL = "acl"
 
 
+class CacheLicenseType(StrEnum):
+    RSAL_2 = "rsal-2.0"
+    SSPL_1 = "sspl-1.0"
+    AGPL_3 = "agpl-3.0"
+    REDIS_ENTERPRISE = "redis-enterprise"
+    REDIS_CLOUD = "redis-cloud"
+
+
+COMMERCIAL_LICENSES = frozenset({CacheLicenseType.REDIS_ENTERPRISE, CacheLicenseType.REDIS_CLOUD})
+
+
+class CacheLicenseStatus(StrEnum):
+    NOT_REQUIRED = "not_required"
+    VALID = "valid"
+    EXPIRING = "expiring"
+    EXPIRED = "expired"
+
+
 class CacheEnvironment(StrEnum):
     TEST = "test"
     PRODUCTION = "production"
