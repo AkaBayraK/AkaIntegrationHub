@@ -3,6 +3,8 @@ import { HubApiError } from '../../api/client';
 import type { ProviderType, SmtpAccount } from '../../api/types';
 import { useTranslation } from '../../context';
 import type { MessageKey } from '../../i18n/messages';
+import { Icon } from '../Icon';
+import type { IntegrationTypeId } from '../integrations/catalog';
 
 export const SMTP_BASE_PATH = '/admin/email/providers';
 
@@ -53,10 +55,10 @@ export function ProviderMark({ providerType, size = 'md' }: { providerType: Prov
   );
 }
 
-export function TypeMark({ symbol, type }: { symbol: string; type: string }) {
+export function TypeMark({ type }: { type: IntegrationTypeId }) {
   return (
-    <span className={`aih-mark aih-mark--md aih-mark--type-${type}`} aria-hidden="true">
-      {symbol}
+    <span className={`aih-mark aih-mark--md aih-mark--type aih-mark--type-${type}`} aria-hidden="true">
+      <Icon name={`type-${type}`} size={24} />
     </span>
   );
 }

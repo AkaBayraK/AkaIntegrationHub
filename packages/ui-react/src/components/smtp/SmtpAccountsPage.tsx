@@ -126,7 +126,7 @@ export function SmtpAccountsPage({ basePath = SMTP_BASE_PATH, homePath = '/' }: 
 
       <div className="aih-row aih-row--between">
         <div className="aih-row aih-page-title">
-          <TypeMark symbol="✉" type="email" />
+          <TypeMark type="email" />
           <div>
             <h1>{t('smtp.title')}</h1>
             <p className="aih-muted">{t('smtp.description')}</p>

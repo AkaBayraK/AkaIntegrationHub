@@ -177,7 +177,7 @@ function TypeTile({ type, count }: { type: IntegrationType; count: number }) {
     return (
       <div className="aih-type aih-type--soon" aria-disabled="true">
         <div className="aih-type__head">
-          <TypeMark symbol={type.symbol} type={type.id} />
+          <TypeMark type={type.id} />
           <span>
             <span className="aih-type__name">{name}</span>
             <span className="aih-type__desc">{t(type.descriptionKey)}</span>
@@ -200,7 +200,7 @@ function TypeTile({ type, count }: { type: IntegrationType; count: number }) {
           if (type.basePath) navigation.navigate(type.basePath);
         }}
       >
-        <TypeMark symbol={type.symbol} type={type.id} />
+        <TypeMark type={type.id} />
         <span>
           <span className="aih-type__name">{name}</span>
           <span className="aih-type__desc">{t(type.descriptionKey)}</span>
