@@ -36,7 +36,12 @@ describe('AppShell', () => {
     const tabs = screen.getByRole('navigation', { name: 'Ana menü' });
     expect(within(tabs).getByRole('link', { name: 'Ana Sayfa' })).toHaveAttribute('aria-current', 'page');
 
-    fireEvent.change(screen.getByLabelText('Dil'), { target: { value: 'en' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Dil: Türkçe' }));
+    expect(screen.getByRole('option', { name: 'Türkçe' })).toHaveAttribute('aria-selected', 'true');
+    fireEvent.click(screen.getByRole('button', { name: 'English' }));
+
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Language: English' })).toBeInTheDocument();
 
     const englishTabs = screen.getByRole('navigation', { name: 'Main navigation' });
     expect(within(englishTabs).getByRole('link', { name: 'Home' })).toBeInTheDocument();

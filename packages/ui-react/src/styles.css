@@ -31,8 +31,27 @@
 .aih-tab--active, .aih-tab--active:hover { background: var(--aih-color-text); color: var(--aih-color-surface); }
 .aih-shell__actions { display: flex; align-items: center; gap: var(--aih-space-2); }
 .aih-shell__tools { gap: var(--aih-space-2); padding-inline: var(--aih-space-2); }
-.aih-locale { display: flex; align-items: center; gap: var(--aih-space-1); color: var(--aih-color-text-muted); }
-.aih-locale select { font: inherit; border: 0; background: transparent; color: var(--aih-color-text); cursor: pointer; }
+.aih-locale { position: relative; }
+.aih-locale__button {
+  display: inline-flex; align-items: center; gap: var(--aih-space-2); height: 40px; padding: 0 var(--aih-space-3);
+  font: inherit; font-weight: 600; color: var(--aih-color-text); background: transparent; border: 0;
+  border-radius: 999px; cursor: pointer;
+}
+.aih-locale__button:hover { background: var(--aih-color-bg); }
+.aih-flag { display: block; flex-shrink: 0; border-radius: 3px; box-shadow: 0 0 0 1px rgb(0 0 0 / 0.08); }
+.aih-locale__menu {
+  position: absolute; left: 0; top: calc(100% + var(--aih-space-2)); z-index: 20; min-width: 160px;
+  list-style: none; margin: 0; padding: var(--aih-space-1);
+  background: var(--aih-color-surface); border: 1px solid var(--aih-color-border); border-radius: var(--aih-radius-md);
+  box-shadow: 0 10px 30px rgb(11 27 63 / 0.12);
+}
+.aih-locale__menu button {
+  display: flex; align-items: center; gap: var(--aih-space-2); width: 100%; padding: var(--aih-space-2) var(--aih-space-3);
+  font: inherit; color: var(--aih-color-text); background: transparent; border: 0; border-radius: var(--aih-radius-sm);
+  cursor: pointer; text-align: left;
+}
+.aih-locale__menu button:hover { background: var(--aih-color-bg); }
+.aih-locale__menu [aria-selected="true"] button { font-weight: 600; color: var(--aih-color-accent); }
 .aih-user { padding-right: var(--aih-space-4); gap: var(--aih-space-2); }
 .aih-user__avatar {
   display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; font-size: 0.8125rem; font-weight: 700;

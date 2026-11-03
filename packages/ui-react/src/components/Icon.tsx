@@ -7,8 +7,7 @@ export type IconName =
   | 'settings'
   | 'sun'
   | 'moon'
-  | 'logout'
-  | 'globe';
+  | 'logout';
 
 const PATHS: Record<IconName, readonly string[]> = {
   home: ['M4 4h6v6H4z', 'M14 4h6v6h-6z', 'M4 14h6v6H4z', 'M14 14h6v6h-6z'],
@@ -26,7 +25,6 @@ const PATHS: Record<IconName, readonly string[]> = {
   ],
   moon: ['M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z'],
   logout: ['M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4', 'm16 17 5-5-5-5', 'M21 12H9'],
-  globe: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', 'M3 12h18', 'M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18z'],
 };
 
 export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {

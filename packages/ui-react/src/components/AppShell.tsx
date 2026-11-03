@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import { useAkaIntegration, useTranslation } from '../context';
-import type { Locale, MessageKey } from '../i18n/messages';
+import type { MessageKey } from '../i18n/messages';
 import { Icon, type IconName } from './Icon';
+import { LocaleSwitcher } from './LocaleSwitcher';
 import { LogoMark } from './LogoMark';
 
 export interface NavItem {
@@ -19,7 +20,6 @@ export const DEFAULT_NAV_ITEMS: readonly NavItem[] = [
   { path: '/settings', labelKey: 'nav.settings', icon: 'settings' },
 ];
 
-const LOCALES: readonly Locale[] = ['tr', 'en'];
 const NOTIFICATIONS_PATH = '/notifications';
 
 function isActive(currentPath: string, path: string): boolean {
@@ -45,7 +45,7 @@ export function AppShell({
   /** Host uygulamaya dönüş bağlantısı gibi ek başlık içeriği. */
   headerExtra?: ReactNode;
 }) {
-  const { auth, locale, theme, navigation } = useAkaIntegration();
+  const { auth, theme, navigation } = useAkaIntegration();
   const t = useTranslation();
   const railItems = navItems.filter((item) => item.icon);
   const go = (path: string) => (event: { preventDefault: () => void }) => {
@@ -85,17 +85,7 @@ export function AppShell({
         </nav>
         <div className="aih-shell__actions">
           <div className="aih-pill aih-shell__tools">
-            <label className="aih-locale">
-              <Icon name="globe" size={18} />
-              <span className="aih-visually-hidden">{t('shell.locale.label')}</span>
-              <select value={locale.locale} onChange={(event) => locale.setLocale(event.target.value as Locale)}>
-                {LOCALES.map((code) => (
-                  <option key={code} value={code}>
-                    {code.toUpperCase()}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <LocaleSwitcher />
             <a
               href={NOTIFICATIONS_PATH}
               className="aih-icon-button"
