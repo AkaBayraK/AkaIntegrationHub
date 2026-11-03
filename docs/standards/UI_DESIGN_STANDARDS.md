@@ -68,6 +68,9 @@ Entegrasyon türleri `type-email`, `type-cache`, `type-queue`, `type-sms`, `type
 - Durum renkleri: başarılı `success` (yeşil), hata `danger` (kırmızı), uyarı `warning` (amber), bilgi/varsayılan
   `accent` (mavi), pasif `neutral` (gri). Renk tek başına anlam taşımaz; yanında metin ya da ikon vardır.
 - Ton: zemin %6–14 tint, ikon/metin tam renk. Dolu renkli büyük alan yalnız birincil düğme ve aktif sekmede.
+- **Kutu kenarı = durum rengi.** Sağlığı olan her kart, liste öğesi ve detay paneli `healthClass(tone, ...)` ile
+  çizilir: sağlıklı yeşil, hatalı kırmızı, test edilmemiş/lisansı bitmek üzere amber, pasif gri. Kenar rengi her
+  zaman aynı kutudaki durum rozetiyle aynıdır.
 
 ## 6. Tipografi, boşluk, şekil
 

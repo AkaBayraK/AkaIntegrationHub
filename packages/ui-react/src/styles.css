@@ -533,3 +533,21 @@
   background: color-mix(in srgb, #d97706 5%, var(--aih-color-surface));
 }
 .aih-license legend { display: inline-flex; align-items: center; gap: var(--aih-space-2); padding: 0 var(--aih-space-2); font-weight: 700; }
+
+/* Durum rengiyle aynı kenar: sağlıklı yeşil, hatalı kırmızı, test edilmemiş amber, pasif gri */
+.aih-health { --aih-health-color: var(--aih-color-border); border-color: color-mix(in srgb, var(--aih-health-color) 60%, var(--aih-color-border)); }
+.aih-health--success { --aih-health-color: var(--aih-color-success); }
+.aih-health--danger { --aih-health-color: var(--aih-color-danger); }
+.aih-health--warning { --aih-health-color: #d97706; }
+.aih-health--neutral { --aih-health-color: var(--aih-color-text-muted); }
+.aih-defined.aih-health, .aih-detail.aih-health { border-width: 1.5px; }
+.aih-defined.aih-health:hover { box-shadow: 0 0 0 4px color-mix(in srgb, var(--aih-health-color) 12%, transparent); }
+.aih-list__item.aih-health { border-color: color-mix(in srgb, var(--aih-health-color) 45%, transparent); }
+.aih-list__item.aih-health.aih-list__item--active {
+  border-color: var(--aih-health-color);
+  background: color-mix(in srgb, var(--aih-health-color) 8%, var(--aih-color-surface));
+}
+.aih-list ul { gap: var(--aih-space-2); }
+.aih-detail__section > .aih-badge, .aih-detail__section > p { justify-self: start; margin: 0; }
+.aih-defined__head { flex-wrap: wrap; }
+.aih-defined__title { min-width: 150px; }

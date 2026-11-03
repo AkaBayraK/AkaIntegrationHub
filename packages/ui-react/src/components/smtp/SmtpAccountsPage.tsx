@@ -14,6 +14,7 @@ import {
   formatDate,
   HEALTH_LABELS,
   HEALTH_TONES,
+  healthClass,
   Kpi,
   PROVIDER_LABELS,
   ProviderMark,
@@ -285,7 +286,11 @@ function AccountList({
             <li key={account.id}>
               <button
                 type="button"
-                className={account.id === selectedId ? 'aih-list__item aih-list__item--active' : 'aih-list__item'}
+                className={healthClass(
+                  HEALTH_TONES[health],
+                  'aih-list__item',
+                  account.id === selectedId ? 'aih-list__item--active' : '',
+                )}
                 aria-current={account.id === selectedId ? 'true' : undefined}
                 onClick={() => onSelect(account.id)}
               >
@@ -343,7 +348,7 @@ function AccountDetail({
 
   const busyLabel = busy ? t('common.loading') : t('smtp.action.test');
   return (
-    <section className="aih-surface aih-detail" aria-labelledby={headingId}>
+    <section className={healthClass(HEALTH_TONES[health], 'aih-surface', 'aih-detail')} aria-labelledby={headingId}>
       <DetailHero
         mark={<ProviderMark providerType={account.providerType} />}
         title={account.name}

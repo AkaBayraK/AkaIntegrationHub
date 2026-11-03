@@ -10,6 +10,8 @@ import {
   formatDate,
   HEALTH_LABELS,
   HEALTH_TONES,
+  healthClass,
+  type HealthTone,
   StatusPill,
   TypeMark,
 } from '../smtp/shared';
@@ -122,11 +124,16 @@ export function CacheAccountsPage({ homePath = '/' }: { homePath?: string }) {
             <ul aria-label={t('cache.list.label')}>
               {(accounts ?? []).map((account) => {
                 const health = accountHealth(account);
+                const tone = cacheTone(account);
                 return (
                   <li key={account.id}>
                     <button
                       type="button"
-                      className={account.id === selected.id ? 'aih-list__item aih-list__item--active' : 'aih-list__item'}
+                      className={healthClass(
+                        tone,
+                        'aih-list__item',
+                        account.id === selected.id ? 'aih-list__item--active' : '',
+                      )}
                       aria-current={account.id === selected.id ? 'true' : undefined}
                       onClick={() => {
                         setSelectedId(account.id);
@@ -138,7 +145,7 @@ export function CacheAccountsPage({ homePath = '/' }: { homePath?: string }) {
                         <span className="aih-list__name">{account.name}</span>
                         <span className="aih-list__sub">{`${account.host}:${account.port}`}</span>
                       </span>
-                      <span className={`aih-dot aih-dot--${HEALTH_TONES[health]}`} title={t(HEALTH_LABELS[health])} />
+                      <span className={`aih-dot aih-dot--${tone}`} title={t(HEALTH_LABELS[health])} />
                     </button>
                   </li>
                 );
@@ -179,7 +186,7 @@ function CacheDetail({
   const provider = account.providerType === 'valkey' ? 'Valkey' : t('cache.provider.redis');
   const environment = t(account.environment === 'production' ? 'smtp.env.production' : 'smtp.env.test');
   return (
-    <section className="aih-surface aih-detail" aria-labelledby={headingId}>
+    <section className={healthClass(cacheTone(account), 'aih-surface', 'aih-detail')} aria-labelledby={headingId}>
       <DetailHero
         mark={<TypeMark type="cache" />}
         title={account.name}
@@ -243,6 +250,13 @@ function CacheDetail({
       <ConsolePanel url={account.consoleUrl} title={account.name} />
     </section>
   );
+}
+
+/** Lisansı dolmuş ya da bitmek üzere olan Redis hesabı bağlantısı sağlıklı olsa da uyarı rengini alır. */
+function cacheTone(account: CacheAccount): HealthTone {
+  if (account.licenseStatus === 'expired') return 'danger';
+  const tone = HEALTH_TONES[accountHealth(account)];
+  return account.licenseStatus === 'expiring' && tone === 'success' ? 'warning' : tone;
 }
 
 const LICENSE_TONES = {

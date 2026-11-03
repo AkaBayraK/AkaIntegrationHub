@@ -40,6 +40,13 @@ export const HEALTH_TONES: Record<AccountHealth, 'success' | 'danger' | 'warning
   disabled: 'neutral',
 };
 
+export type HealthTone = (typeof HEALTH_TONES)[AccountHealth];
+
+/** Kutunun kenar rengi durum rozetiyle aynı tondadır (yeşil sağlıklı, kırmızı hatalı, amber test edilmemiş). */
+export function healthClass(tone: HealthTone, ...classes: string[]): string {
+  return [...classes, 'aih-health', `aih-health--${tone}`].join(' ');
+}
+
 export function accountHealth(account: Pick<SmtpAccount, 'enabled' | 'lastTestOutcome'>): AccountHealth {
   if (!account.enabled) return 'disabled';
   if (account.lastTestOutcome === 'failed') return 'failing';

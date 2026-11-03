@@ -8,6 +8,7 @@ import {
   formatDate,
   HEALTH_LABELS,
   HEALTH_TONES,
+  healthClass,
   PROVIDER_LABELS,
   ProviderMark,
   StatusPill,
@@ -242,7 +243,7 @@ function EmailIntegrationCard({ account }: { account: SmtpAccount }) {
   const emailType = INTEGRATION_TYPES.find((type) => type.id === 'email');
   const basePath = emailType?.basePath ?? '';
   return (
-    <article className={health === 'failing' ? 'aih-defined aih-defined--failing' : 'aih-defined'}>
+    <article className={healthClass(HEALTH_TONES[health], 'aih-defined', health === 'failing' ? 'aih-defined--failing' : '')}>
       <header className="aih-defined__head">
         <ProviderMark providerType={account.providerType} />
         <a
