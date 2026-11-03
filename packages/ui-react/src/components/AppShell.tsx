@@ -15,6 +15,7 @@ export const DEFAULT_NAV_ITEMS: readonly NavItem[] = [
   { path: '/', labelKey: 'nav.dashboard', icon: 'home' },
   { path: '/admin/email/providers', labelKey: 'nav.emailProviders', icon: 'mail' },
   { path: '/admin/email/deliveries', labelKey: 'nav.emailDeliveries', icon: 'history' },
+  { path: '/admin/cache/providers', labelKey: 'nav.cache', icon: 'type-cache' },
   { path: '/providers', labelKey: 'nav.providers', icon: 'layers' },
   { path: '/notifications', labelKey: 'nav.notifications', icon: 'bell' },
   { path: '/settings', labelKey: 'nav.settings', icon: 'settings' },
@@ -59,12 +60,12 @@ export function AppShell({
         {t('shell.skipToContent')}
       </a>
       <header className="aih-shell__header">
-        <div className="aih-shell__brand aih-pill">
+        <div className="aih-shell__brand aih-capsule">
           <LogoMark size={28} />
           <span>{t('app.name')}</span>
         </div>
         {headerExtra && <div className="aih-shell__extra">{headerExtra}</div>}
-        <nav className="aih-shell__tabs aih-pill" aria-label={t('shell.mainNavigation')}>
+        <nav className="aih-shell__tabs aih-capsule" aria-label={t('shell.mainNavigation')}>
           <ul>
             {navItems.map((item) => {
               const active = isActive(navigation.currentPath, item.path);
@@ -84,7 +85,7 @@ export function AppShell({
           </ul>
         </nav>
         <div className="aih-shell__actions">
-          <div className="aih-pill aih-shell__tools">
+          <div className="aih-capsule aih-shell__tools">
             <LocaleSwitcher />
             <a
               href={NOTIFICATIONS_PATH}
@@ -97,7 +98,7 @@ export function AppShell({
             </a>
           </div>
           {auth.isAuthenticated && (
-            <div className="aih-pill aih-user">
+            <div className="aih-capsule aih-user">
               <span className="aih-user__avatar" aria-hidden>
                 {initials(auth.displayName ?? '') || '•'}
               </span>
@@ -114,7 +115,7 @@ export function AppShell({
               className="aih-icon-button"
               aria-pressed={theme.mode === 'light'}
               aria-label={t('shell.theme.toLight')}
-              title={t('shell.theme.toLight')}
+              data-tooltip={t('shell.theme.toLight')}
               onClick={() => theme.setMode('light')}
             >
               <Icon name="sun" />
@@ -124,7 +125,7 @@ export function AppShell({
               className="aih-icon-button"
               aria-pressed={theme.mode === 'dark'}
               aria-label={t('shell.theme.toDark')}
-              title={t('shell.theme.toDark')}
+              data-tooltip={t('shell.theme.toDark')}
               onClick={() => theme.setMode('dark')}
             >
               <Icon name="moon" />
@@ -140,7 +141,7 @@ export function AppShell({
                     href={item.path}
                     aria-current={active ? 'page' : undefined}
                     aria-label={t(item.labelKey)}
-                    title={t(item.labelKey)}
+                    data-tooltip={t(item.labelKey)}
                     className={active ? 'aih-icon-button aih-icon-button--active' : 'aih-icon-button'}
                     onClick={go(item.path)}
                   >
@@ -156,7 +157,7 @@ export function AppShell({
                 type="button"
                 className="aih-icon-button"
                 aria-label={t('shell.signOut')}
-                title={t('shell.signOut')}
+                data-tooltip={t('shell.signOut')}
                 onClick={auth.signOut}
               >
                 <Icon name="logout" />

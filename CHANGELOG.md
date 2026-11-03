@@ -1,6 +1,11 @@
 # Changelog
 
 ## [Unreleased]
+### Arayüz — detay ekranları ve tasarım standardı
+- SMTP ve Cache detayları: başlık kartı (ikon, durum, eylemler), ikonlu bilgi kutuları, ikonlu bağlantı adımları,
+  sunucu özeti kartları. Sol şeritte üzerine gelince ad görünür; üst menüye Cache eklendi.
+- `docs/standards/UI_DESIGN_STANDARDS.md`: ilkeler, sayfa iskeleti, ikon sözlüğü, renk/tipografi ve kontrol listesi.
+
 ### Cache (Valkey) entegrasyonu ve yönetim arayüzü
 - Cache hesapları: Valkey (önerilen) ve müşterinin kendi Redis sunucusu; ACL/şifre (şifreli saklanır), TLS, veritabanı
   ve anahtar ön eki, tenant + ortam başına tek varsayılan, RLS. API: `/v1/tenants/{id}/cache-accounts`.

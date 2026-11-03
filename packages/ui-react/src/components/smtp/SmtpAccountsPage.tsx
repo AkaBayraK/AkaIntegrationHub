@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { AccountEnvironment, ConnectionTest, ProviderType, SmtpAccount } from '../../api/types';
 import { useAkaIntegration, useTranslation } from '../../context';
 import { useHubClient, useHubSession } from '../../session';
 import { ConsolePanel } from '../console/ConsolePanel';
+import { ActionButton, DetailHero, InfoTiles, SectionTitle } from '../ui/Detail';
 import { ConnectionTestResult } from './ConnectionTestResult';
 import { SendTestEmailPanel } from './SendTestEmailPanel';
 import {
@@ -340,45 +341,83 @@ function AccountDetail({
   const tls = t(`smtp.form.tls.${account.tlsMode}` as const);
   const secret = t(account.hasSecret ? 'smtp.detail.secretStored' : 'smtp.detail.noSecret');
 
+  const busyLabel = busy ? t('common.loading') : t('smtp.action.test');
   return (
     <section className="aih-surface aih-detail" aria-labelledby={headingId}>
-      <header className="aih-detail__head">
-        <ProviderMark providerType={account.providerType} />
-        <div className="aih-detail__title">
-          <h2 id={headingId}>{account.name}</h2>
-          <p className="aih-muted">
-            {PROVIDER_LABELS[account.providerType]} ·{' '}
-            {t(account.environment === 'production' ? 'smtp.env.production' : 'smtp.env.test')}
-          </p>
-        </div>
-        <div className="aih-row aih-row--wrap">
-          {account.isDefault && <Badge tone="accent">{t('smtp.default')}</Badge>}
-          <StatusPill tone={HEALTH_TONES[health]}>{t(HEALTH_LABELS[health])}</StatusPill>
-        </div>
-      </header>
+      <DetailHero
+        mark={<ProviderMark providerType={account.providerType} />}
+        title={account.name}
+        titleId={headingId}
+        subtitle={`${PROVIDER_LABELS[account.providerType]} · ${t(
+          account.environment === 'production' ? 'smtp.env.production' : 'smtp.env.test',
+        )}`}
+        badges={
+          <>
+            <StatusPill tone={HEALTH_TONES[health]}>{t(HEALTH_LABELS[health])}</StatusPill>
+            {account.isDefault && <Badge tone="accent">{t('smtp.default')}</Badge>}
+          </>
+        }
+        actions={
+          <>
+            {canTest && (
+              <ActionButton
+                icon="play"
+                variant="primary"
+                label={busyLabel}
+                onClick={onTest}
+                disabled={busy}
+                ariaLabel={`${t('smtp.action.test')}: ${account.name}`}
+              />
+            )}
+            {canSend && account.enabled && (
+              <ActionButton
+                icon="send"
+                label={t('smtp.action.sendTest')}
+                onClick={onSendTest}
+                ariaLabel={`${t('smtp.action.sendTest')}: ${account.name}`}
+              />
+            )}
+            {canWrite && (
+              <ActionButton
+                icon="pencil"
+                label={t('smtp.action.edit')}
+                onClick={() => navigation.navigate(`${basePath}/${account.id}/edit`)}
+                ariaLabel={`${t('smtp.action.edit')}: ${account.name}`}
+              />
+            )}
+          </>
+        }
+      />
 
-      <dl className="aih-facts">
-        <Fact label={t('smtp.col.sender')} value={account.senderAddress} />
-        <Fact label={t('smtp.col.host')} value={<code>{`${account.host}:${account.port}`}</code>} />
-        <Fact label={t('smtp.detail.security')} value={`${tls} · ${secret}`} />
-        <Fact label={t('smtp.detail.priority')} value={account.priority} />
-        <Fact label={t('smtp.detail.timeout')} value={`${account.timeoutSeconds} ${t('smtp.detail.seconds')}`} />
-        <Fact
-          label={t('smtp.detail.rateLimit')}
-          value={
-            account.rateLimitPerMinute ? `${account.rateLimitPerMinute} ${t('smtp.detail.perMinute')}` : t('smtp.detail.unlimited')
-          }
-        />
-        <Fact label={t('smtp.col.lastSend')} value={formatDate(account.lastSuccessSendAt, locale.locale) ?? t('smtp.never')} />
-      </dl>
+      <InfoTiles
+        items={[
+          { icon: 'at', label: t('smtp.col.sender'), value: account.senderAddress },
+          { icon: 'server', label: t('smtp.col.host'), value: `${account.host}:${account.port}`, mono: true },
+          { icon: 'shield', label: t('smtp.detail.security'), value: `${tls} · ${secret}` },
+          { icon: 'star', label: t('smtp.detail.priority'), value: account.priority },
+          { icon: 'timer', label: t('smtp.detail.timeout'), value: `${account.timeoutSeconds} ${t('smtp.detail.seconds')}` },
+          {
+            icon: 'gauge',
+            label: t('smtp.detail.rateLimit'),
+            value: account.rateLimitPerMinute
+              ? `${account.rateLimitPerMinute} ${t('smtp.detail.perMinute')}`
+              : t('smtp.detail.unlimited'),
+          },
+          {
+            icon: 'send',
+            label: t('smtp.col.lastSend'),
+            value: formatDate(account.lastSuccessSendAt, locale.locale) ?? t('smtp.never'),
+          },
+        ]}
+      />
 
-      <ConsolePanel url={account.consoleUrl} title={account.name} />
-
-      <div className="aih-detail__test">
-        <h3>
+      <div className="aih-detail__section">
+        <SectionTitle
+          icon="activity"
+          aside={account.lastTestAt && <span className="aih-muted">{formatDate(account.lastTestAt, locale.locale)}</span>}
+        >
           {t('smtp.detail.lastTest')}
-          {account.lastTestAt && <span className="aih-muted"> · {formatDate(account.lastTestAt, locale.locale)}</span>}
-        </h3>
+        </SectionTitle>
         {testResult ? (
           <ConnectionTestResult result={testResult} onClose={onCloseTest} />
         ) : account.lastTestOutcome ? (
@@ -390,68 +429,26 @@ function AccountDetail({
         )}
       </div>
 
-      <div className="aih-row aih-row--wrap">
-        {canTest && (
-          <button
-            type="button"
-            className="aih-button aih-button--primary"
-            onClick={onTest}
-            disabled={busy}
-            aria-label={`${t('smtp.action.test')}: ${account.name}`}
-          >
-            {busy ? t('common.loading') : t('smtp.action.test')}
-          </button>
-        )}
-        {canSend && account.enabled && (
-          <button
-            type="button"
-            className="aih-button aih-button--ghost"
-            onClick={onSendTest}
-            aria-label={`${t('smtp.action.sendTest')}: ${account.name}`}
-          >
-            {t('smtp.action.sendTest')}
-          </button>
-        )}
-        {canWrite && (
-          <button
-            type="button"
-            className="aih-button aih-button--ghost"
-            onClick={() => navigation.navigate(`${basePath}/${account.id}/edit`)}
-            aria-label={`${t('smtp.action.edit')}: ${account.name}`}
-          >
-            {t('smtp.action.edit')}
-          </button>
-        )}
-        {canWrite && account.enabled && !account.isDefault && (
-          <button
-            type="button"
-            className="aih-button aih-button--ghost"
-            onClick={onMakeDefault}
-            aria-label={`${t('smtp.action.makeDefault')}: ${account.name}`}
-          >
-            {t('smtp.action.makeDefault')}
-          </button>
-        )}
-        {canWrite && (
-          <button
-            type="button"
-            className="aih-button aih-button--ghost"
-            onClick={onToggle}
-            aria-label={`${t(account.enabled ? 'smtp.action.disable' : 'smtp.action.enable')}: ${account.name}`}
-          >
-            {t(account.enabled ? 'smtp.action.disable' : 'smtp.action.enable')}
-          </button>
-        )}
-      </div>
-    </section>
-  );
-}
+      <ConsolePanel url={account.consoleUrl} title={account.name} />
 
-function Fact({ label, value }: { label: string; value: ReactNode }) {
-  return (
-    <div className="aih-fact">
-      <dt>{label}</dt>
-      <dd>{value}</dd>
-    </div>
+      {canWrite && (
+        <div className="aih-detail__footer">
+          {account.enabled && !account.isDefault && (
+            <ActionButton
+              icon="star"
+              label={t('smtp.action.makeDefault')}
+              onClick={onMakeDefault}
+              ariaLabel={`${t('smtp.action.makeDefault')}: ${account.name}`}
+            />
+          )}
+          <ActionButton
+            icon="power"
+            label={t(account.enabled ? 'smtp.action.disable' : 'smtp.action.enable')}
+            onClick={onToggle}
+            ariaLabel={`${t(account.enabled ? 'smtp.action.disable' : 'smtp.action.enable')}: ${account.name}`}
+          />
+        </div>
+      )}
+    </section>
   );
 }

@@ -10,10 +10,10 @@ import {
   formatDate,
   HEALTH_LABELS,
   HEALTH_TONES,
-  Kpi,
   StatusPill,
   TypeMark,
 } from '../smtp/shared';
+import { ActionButton, DetailHero, InfoTiles, SectionTitle, StepTimeline } from '../ui/Detail';
 import { CacheAccountForm } from './CacheAccountForm';
 
 export const CACHE_BASE_PATH = '/admin/cache/providers';
@@ -176,86 +176,86 @@ function CacheDetail({
   const session = useHubSession();
   const health = accountHealth(account);
   const headingId = `aih-cache-${account.id}`;
+  const provider = account.providerType === 'valkey' ? 'Valkey' : t('cache.provider.redis');
+  const environment = t(account.environment === 'production' ? 'smtp.env.production' : 'smtp.env.test');
   return (
     <section className="aih-surface aih-detail" aria-labelledby={headingId}>
-      <header className="aih-detail__head">
-        <TypeMark type="cache" />
-        <div className="aih-detail__title">
-          <h2 id={headingId}>{account.name}</h2>
-          <p className="aih-muted">
-            {account.providerType === 'valkey' ? 'Valkey' : t('cache.provider.redis')}
-            {account.serverVersion ? ` ${account.serverVersion}` : ''} ·{' '}
-            {t(account.environment === 'production' ? 'smtp.env.production' : 'smtp.env.test')}
-          </p>
-        </div>
-        <div className="aih-row aih-row--wrap">
-          {account.isDefault && <Badge tone="accent">{t('smtp.default')}</Badge>}
-          <StatusPill tone={HEALTH_TONES[health]}>{t(HEALTH_LABELS[health])}</StatusPill>
-        </div>
-      </header>
-      <dl className="aih-facts">
-        <Fact label={t('smtp.col.host')} value={`${account.host}:${account.port}`} code />
-        <Fact label={t('cache.form.database')} value={`db${account.databaseIndex}`} code />
-        <Fact
-          label={t('smtp.detail.security')}
-          value={`${t(account.tlsEnabled ? 'cache.tls.on' : 'cache.tls.off')} · ${t(`cache.auth.${account.authMode}` as const)}`}
-        />
-        <Fact label={t('cache.form.prefix')} value={account.keyPrefix ?? '—'} code />
-        <Fact
-          label={t('smtp.detail.lastTest')}
-          value={formatDate(account.lastTestAt, locale.locale) ?? t('smtp.detail.notTested')}
-        />
-      </dl>
+      <DetailHero
+        mark={<TypeMark type="cache" />}
+        title={account.name}
+        titleId={headingId}
+        subtitle={`${provider}${account.serverVersion ? ` ${account.serverVersion}` : ''} · ${environment}`}
+        badges={
+          <>
+            <StatusPill tone={HEALTH_TONES[health]}>{t(HEALTH_LABELS[health])}</StatusPill>
+            {account.isDefault && <Badge tone="accent">{t('smtp.default')}</Badge>}
+          </>
+        }
+        actions={
+          <>
+            {session.can('cache-account:test') && (
+              <ActionButton
+                icon="play"
+                variant="primary"
+                label={testing ? t('common.loading') : t('smtp.action.test')}
+                onClick={onTest}
+                disabled={testing}
+                ariaLabel={`${t('smtp.action.test')}: ${account.name}`}
+              />
+            )}
+            {onEdit && (
+              <ActionButton
+                icon="pencil"
+                label={t('smtp.action.edit')}
+                onClick={onEdit}
+                ariaLabel={`${t('smtp.action.edit')}: ${account.name}`}
+              />
+            )}
+          </>
+        }
+      />
+      <InfoTiles
+        label={t('detail.facts')}
+        items={[
+          { icon: 'server', label: t('smtp.col.host'), value: `${account.host}:${account.port}`, mono: true },
+          { icon: 'database', label: t('cache.form.database'), value: `db${account.databaseIndex}`, mono: true },
+          {
+            icon: account.tlsEnabled ? 'lock' : 'shield',
+            label: t('smtp.detail.security'),
+            value: `${t(account.tlsEnabled ? 'cache.tls.on' : 'cache.tls.off')} · ${t(`cache.auth.${account.authMode}` as const)}`,
+          },
+          { icon: 'tag', label: t('cache.form.prefix'), value: account.keyPrefix ?? '—', mono: true },
+          { icon: 'timer', label: t('smtp.detail.timeout'), value: `${account.timeoutSeconds} ${t('smtp.detail.seconds')}` },
+          {
+            icon: 'clock',
+            label: t('smtp.detail.lastTest'),
+            value: formatDate(account.lastTestAt, locale.locale) ?? t('smtp.detail.notTested'),
+          },
+        ]}
+      />
       {result && <CacheTestResult result={result} t={t} />}
       <ConsolePanel url={account.consoleUrl} title={account.name} />
-      <div className="aih-row aih-row--wrap">
-        {session.can('cache-account:test') && (
-          <button
-            type="button"
-            className="aih-button aih-button--primary"
-            onClick={onTest}
-            disabled={testing}
-            aria-label={`${t('smtp.action.test')}: ${account.name}`}
-          >
-            {testing ? t('common.loading') : t('smtp.action.test')}
-          </button>
-        )}
-        {onEdit && (
-          <button
-            type="button"
-            className="aih-button aih-button--ghost"
-            onClick={onEdit}
-            aria-label={`${t('smtp.action.edit')}: ${account.name}`}
-          >
-            {t('smtp.action.edit')}
-          </button>
-        )}
-      </div>
     </section>
   );
 }
 
 function CacheTestResult({ result, t }: { result: CacheConnectionTest; t: Translate }) {
   return (
-    <div className="aih-detail__test" role="status">
-      <h3>
-        <Badge tone={result.outcome === 'passed' ? 'success' : 'danger'}>
-          {t(result.outcome === 'passed' ? 'smtp.test.passed' : 'smtp.test.failed')}
-        </Badge>{' '}
-        <span className="aih-muted">
-          {result.durationMs} ms{result.errorCode ? ` · ${result.errorCode}` : ''}
-        </span>
-      </h3>
-      <ol className="aih-steps">
-        {result.steps.map((step) => (
-          <li key={step.step} className={`aih-steps__item aih-steps__item--${step.outcome}`}>
-            <span>{step.step.toUpperCase()}</span>
-            <span className="aih-muted">
-              {step.durationMs} ms{step.errorCode ? ` · ${step.errorCode}` : ''}
-            </span>
-          </li>
-        ))}
-      </ol>
+    <div className="aih-detail__section" role="status">
+      <SectionTitle
+        icon="activity"
+        aside={
+          <span className="aih-row">
+            <Badge tone={result.outcome === 'passed' ? 'success' : 'danger'}>
+              {t(result.outcome === 'passed' ? 'smtp.test.passed' : 'smtp.test.failed')}
+            </Badge>
+            <span className="aih-muted">{result.durationMs} ms</span>
+          </span>
+        }
+      >
+        {t('smtp.testResult.title')}
+      </SectionTitle>
+      <StepTimeline steps={result.steps} />
       {result.server && <ServerSummary server={result.server} t={t} />}
     </div>
   );
@@ -269,26 +269,30 @@ function formatUptime(seconds: number | null): string {
 
 function ServerSummary({ server, t }: { server: CacheServerInfo; t: Translate }) {
   const keys = Object.entries(server.keyspace);
+  const total = keys.reduce((sum, [, count]) => sum + count, 0);
   return (
-    <div className="aih-kpis" aria-label={t('cache.server.title')}>
-      <Kpi label={t('cache.server.version')} value={`${server.serverName ?? ''} ${server.version ?? ''}`.trim() || '—'} />
-      <Kpi label={t('cache.server.memory')} value={server.usedMemory ?? '—'} hint={server.evictionPolicy ?? undefined} />
-      <Kpi label={t('cache.server.clients')} value={server.connectedClients ?? '—'} hint={server.role ?? undefined} />
-      <Kpi
-        label={t('cache.server.keys')}
-        value={keys.reduce((sum, [, count]) => sum + count, 0)}
-        hint={keys.map(([db, count]) => `${db}: ${count}`).join(' · ') || undefined}
+    <>
+      <SectionTitle icon="cpu">{t('cache.server.title')}</SectionTitle>
+      <InfoTiles
+        size="lg"
+        label={t('cache.server.title')}
+        items={[
+          {
+            icon: 'server',
+            label: t('cache.server.version'),
+            value: `${server.serverName ?? ''} ${server.version ?? ''}`.trim() || '—',
+            tone: 'accent',
+          },
+          { icon: 'cpu', label: t('cache.server.memory'), value: server.usedMemory ?? '—' },
+          { icon: 'users', label: t('cache.server.clients'), value: server.connectedClients ?? '—' },
+          {
+            icon: 'key',
+            label: t('cache.server.keys'),
+            value: keys.length > 1 ? `${total} (${keys.map(([db, count]) => `${db}: ${count}`).join(' · ')})` : total,
+          },
+          { icon: 'clock', label: t('cache.server.uptime'), value: formatUptime(server.uptimeSeconds), tone: 'success' },
+        ]}
       />
-      <Kpi label={t('cache.server.uptime')} value={formatUptime(server.uptimeSeconds)} />
-    </div>
-  );
-}
-
-function Fact({ label, value, code }: { label: string; value: string; code?: boolean }) {
-  return (
-    <div className="aih-fact">
-      <dt>{label}</dt>
-      <dd>{code ? <code>{value}</code> : value}</dd>
-    </div>
+    </>
   );
 }
